@@ -35,9 +35,6 @@ nix-env -iA nixpkgs.unzip
 nix-env -iA nixpkgs.cht-sh
 nix-env -iA nixpkgs.direnv
 
-# clean up nix prefix
-# nix-channel --remove nixpkgs
-
 # Generate a .zshrc from a template, REPLACING in ${USER}-specific values
 export REPLACE_warning="# WARNING! This file is generated.  To change it, look for the '<filename>_template' version."
 export REPLACE_p10k_home='${XDG_CACHE_HOME:-$HOME/.cache}'
@@ -54,6 +51,17 @@ fi
 for p in .stow-packages/*; do
 	stow -v 1 --target ~/ --dir .stow-packages $(basename $p)
 done
+
+# Install or Update plugins
+if [[ ! -f ~/.tmux/plugins/tpm/bin/install_plugins ]]; then
+	# Install plugins
+	git submodule update --init --remote --merge
+	~/.tmux/plugins/tpm/bin/install_plugins
+else
+	# Update plugins
+	command -v ~/.tmux/plugins/tpm/bin/update_plugins all
+fi
+
 
 # Take the list of plugins in `.zsh_plugins.txt`, and turn that into a `.sh` file that will get sourced in `.zshrc`
 antibody bundle < ~/.zsh_plugins.txt > ~/.zsh_plugins.sh
