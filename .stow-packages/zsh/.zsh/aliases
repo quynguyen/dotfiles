@@ -1,0 +1,16 @@
+# vim: set ft=zsh
+
+# Aliases
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias ls="ls --color=auto"
+alias ll="ls -al"
+alias l="ll"
+alias lg="lazygit"
+alias c="cd"
+alias n="nvim"
+alias cat="bat"
+alias mux="tmuxinator"
+alias nz="nvim ~/.zshrc"
+alias ez="exec zsh"

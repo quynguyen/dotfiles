@@ -1,0 +1,9 @@
+os:
+  editCommmand: 'nvim'
+  editCommandTemplate: '{{editor}} +{{line}} -- {{filename}}'
+
+gui:
+  showIcons: true
+  authorColors:
+    'Quy Nguyen': '#0000FF'
+    '*': '#A020F0'
