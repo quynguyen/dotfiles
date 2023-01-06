@@ -3,6 +3,7 @@ os:
   editCommandTemplate: '{{editor}} +{{line}} -- {{filename}}'
 
 gui:
+  expandFocusedSidePanel: true
   showIcons: true
   authorColors:
     'Quy Nguyen': '#0000FF'
