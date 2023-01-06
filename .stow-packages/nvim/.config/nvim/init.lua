@@ -125,6 +125,14 @@ vim.cmd [[colorscheme dracula]]
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
 
+-- ----------------------------------------------------------------------------- 
+-- Start: Added by Quy
+-- ----------------------------------------------------------------------------- 
+vim.o.clipboard = "unnamedplus"
+-- ----------------------------------------------------------------------------- 
+-- End: Added by Quy
+-- ----------------------------------------------------------------------------- 
+
 -- [[ Basic Keymaps ]]
 -- Set <space> as the leader key
 -- See `:help mapleader`
