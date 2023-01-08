@@ -82,7 +82,7 @@ local toggle_lazygit = function()
   local lazygit = Terminal:new({cmd = "lazygit", direction = "float"})
   return lazygit:toggle()
 end
-local toggle_fl = function()
+local toggle_lf = function()
   local Terminal = require('toggleterm.terminal').Terminal
   local ranger = Terminal:new({cmd = "lf", direction = "float"})
   return ranger:toggle()
@@ -93,25 +93,38 @@ end
 local opts = { prefix = "<leader>" }
 local mappings = {
   t = {
-    name = "[T]oggle Term",
-    l = {toggle_lazygit, '[L]azygit'},
-    t = {toggle_terminal, '[Terminal]'},
-    f = {toggle_lf, '[F]ile Manager'}
+    name = "[t]oggle term",
+    l = {toggle_lazygit, '[l]azygit'},
+    t = {toggle_terminal, '[terminal]'},
+    f = {toggle_lf, '[f]ile manager'}
   },
   s = {
-    name = "[S]earch"
+    name = "[s]earch"
   },
   c = {
-    name = "[C]ode"
-  },
-  w = {
-    name = "[W]orkspace"
+    name = "[c]ode"
   },
   e = { ":!ruby %<CR>", "Execute Ruby" },
   b = { ":!bundle exec rspec %<CR>", "Bundle exec" },
   r = { ":!rspec . --color --format doc<CR>", "Rspec" },
   f = { ":Format<CR>", "Format" },
   i = { "m'gg=G''", "Indent" },
+  x = {":bdelete<cr>", "E[x]it Buffer"},
+  X = {":bdelete!<cr>", "Force e[X]it"},
+  q = {":q<cr>", "[q]uit"},
+  Q = {":q!<cr>", "Force [Q]uit"},
+  w = {":w<cr>", "[w]rite file"},
+  E = {":e ~/.config/nvim/init.lua<cr>", "[E]dit nvim config"},
+  p = {
+    name = "[p]acker",
+    r = {":PackerClean<cr>", "[r]emove unused plugins"},
+    c = {":PackerCompile profile=true<cr>", "[c]ompile plugins"},
+    i = {":PackerInstall<cr>", "[i]nstall plugins"},
+    p = {":PackerProfile<cr>", "Packer [p]rofile"},
+    s = {":PackerSync<cr>", "[s]ync plugins"},
+    S = {":PackerStatus<cr>", "packer [S]tatus"},
+    u = {":PackerUpdate<cr>", "[u]pdate plugins"}
+  },
 }
 require('which-key').register(mappings, opts)
 
