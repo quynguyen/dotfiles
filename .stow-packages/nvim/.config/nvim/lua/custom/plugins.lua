@@ -25,4 +25,5 @@ return function(use)
   use 'akinsho/toggleterm.nvim'
   use 'tpope/vim-surround'
   use 'Mofiqul/dracula.nvim'
+  use 'tpope/vim-unimpaired'
 end
