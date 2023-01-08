@@ -6,7 +6,7 @@ require('lualine').setup {
 
 require('nvim-treesitter.configs').setup {
   -- ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'typescript', 'help', 'html', 'javascript', 'java', 'ruby', 'graphql', 'markdown'  },
-  ensure_installed = 'all' ,
+  ensure_installed = 'all',
   incremental_selection = {
     enable = true,
     keymaps = {
@@ -60,7 +60,7 @@ cmp.setup {
   },
 }
 
-local opts = {prefix = "<leader>"}
+local opts = { prefix = "<leader>" }
 local mappings = {
   s = {
     name = "[S]earch"
@@ -71,7 +71,13 @@ local mappings = {
   w = {
     name = "[W]orkspace"
   },
+  e = { ":!ruby %<CR>", "Execute Ruby" },
+  b = { ":!bundle exec rspec %<CR>", "Bundle exec" },
+  r = { ":!rspec . --color --format doc<CR>", "Rspec" },
+  f = { ":Format<CR>", "Format" },
+  i = { "m'gg=G''", "Indent" },
 }
+
 require('which-key').register(mappings, opts)
 
 require('nvim-autopairs').setup({})
