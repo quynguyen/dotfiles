@@ -22,5 +22,6 @@ return function(use)
     'RRethy/nvim-treesitter-textsubjects',
     after = 'nvim-treesitter',
   }
-  use 'Mofiqul/dracula.nvim' -- Theme inspired by Atom
+  use 'tpope/vim-surround'
+  use 'Mofiqul/dracula.nvim'
 end
