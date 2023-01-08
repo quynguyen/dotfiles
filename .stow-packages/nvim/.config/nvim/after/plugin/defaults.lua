@@ -60,8 +60,44 @@ cmp.setup {
   },
 }
 
+-- Toggle Term
+local toggleterm = require('toggleterm')
+toggleterm.setup {
+  size = 13,
+  open_mapping = [[<c-\>]],
+  shade_filetypes = {},
+  shade_terminals = true,
+  shading_factor = '1',
+  start_in_insert = true,
+  persist_size = true,
+  direction = 'horizontal'
+}
+local toggle_terminal = function()
+  local Terminal = require('toggleterm.terminal').Terminal
+  local float = Terminal:new({direction = "float"})
+  return float:toggle()
+end
+local toggle_lazygit = function()
+  local Terminal = require('toggleterm.terminal').Terminal
+  local lazygit = Terminal:new({cmd = "lazygit", direction = "float"})
+  return lazygit:toggle()
+end
+local toggle_fl = function()
+  local Terminal = require('toggleterm.terminal').Terminal
+  local ranger = Terminal:new({cmd = "lf", direction = "float"})
+  return ranger:toggle()
+end
+
+
+-- WhichKey mappings
 local opts = { prefix = "<leader>" }
 local mappings = {
+  t = {
+    name = "[T]oggle Term",
+    l = {toggle_lazygit, '[L]azygit'},
+    t = {toggle_terminal, '[Terminal]'},
+    f = {toggle_lf, '[F]ile Manager'}
+  },
   s = {
     name = "[S]earch"
   },
@@ -77,12 +113,11 @@ local mappings = {
   f = { ":Format<CR>", "Format" },
   i = { "m'gg=G''", "Indent" },
 }
-
 require('which-key').register(mappings, opts)
 
 require('nvim-autopairs').setup({})
 
-
+-- Settings
 vim.o.clipboard = "unnamedplus"
 vim.o.timeoutlen = 50
 vim.cmd [[colorscheme dracula]]

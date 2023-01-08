@@ -22,6 +22,7 @@ return function(use)
     'RRethy/nvim-treesitter-textsubjects',
     after = 'nvim-treesitter',
   }
+  use 'akinsho/toggleterm.nvim'
   use 'tpope/vim-surround'
   use 'Mofiqul/dracula.nvim'
 end
