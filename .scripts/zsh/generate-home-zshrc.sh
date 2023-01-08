@@ -7,11 +7,28 @@ fi
 
 # Go two parent dirs up from this script
 pushd "$( dirname ${BASH_SOURCE:-$0} )/../../" > /dev/null
+
+export REPLACE_source=${BASH_SOURCE:-$0}
 export REPLACE_dotfiles_path=$(pwd)
 export REPLACE_home=$HOME
-export REPLACE_warning='# WARNING!!!!! This file is generated. To make changes to the source, either a) change '~/.zshrc_template' or use b) type the alias `nz`'
+export REPLACE_file='$file'
 export REPLACE_p10k_home='${XDG_CACHE_HOME:-$HOME/.cache}'
 export REPLACE_p10k_prompt='${(%):-%n}'
+export REPLACE_warning=$(cat <<-END
+# !!!!! WARNING !!!!! 
+#
+# This file is generated. To make changes to the source...
+# 
+# Option 1:
+#	nvim ~/.zshrc_template
+#	run '${REPLACE_source}
+# 
+# Option 2:
+#	Run the convenience alias 'nz'
+#
+END
+)
+
 # Go back
 popd  > /dev/null
 

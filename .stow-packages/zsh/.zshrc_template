@@ -1,5 +1,7 @@
 ${REPLACE_warning}
+
 export DOTFILES_PATH="${REPLACE_dotfiles_path}"
+export REGENERATE_ZSHRC="${REPLACE_source}"
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -11,10 +13,10 @@ fi
 # `lf` -- This is a commandline file explorer
 [[ -f ~/.config/lf/lfcd.sh ]] && source ~/.config/lf/lfcd.sh
 
-# Includes
-[[ -f ~/.zsh/aliases ]] && source ~/.zsh/aliases
-[[ -f ~/.zsh/exports ]] && source ~/.zsh/exports
-[[ -f ~/.zsh/history ]] && source ~/.zsh/history
+# Load includes
+for file in ~/.zsh/*; do
+  source ${REPLACE_file}
+done
 
 # Load plugins
 source ~/.zsh_plugins.sh
