@@ -1,0 +1,17 @@
+#!/bin/zsh
+
+# On the shell cmdline, make `CTRL+C` exit VI insert mode
+function zvm_config() {
+	ZVM_READKEY_ENGINE=$ZVM_READKEY_ENGINE_NEX
+	ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
+	ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
+}
+
+# Autocomplete accept
+bindkey '^ ' autosuggest-accept
+bindkey '^K' forward-word
+
+# LFCD
+if [ -d ~/.config/lf ]; then
+	bindkey -s '^o' 'd\n'
+fi
