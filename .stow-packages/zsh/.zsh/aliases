@@ -16,6 +16,7 @@ alias mux="tmuxinator"
 alias nz="nvim ~/.zshrc_template && echo 'Regenerating .zshrc from .zshrc_template' && ${DOTFILES_PATH}/.scripts/zsh/generate-home-zshrc.sh"
 alias na="nvim ~/.zsh/aliases"
 alias nn="nvim ~/.config/nvim/init.lua"
+alias nx="nvim ~/dotfiles/.scripts/nix/install-nix-packages.sh"
 alias ez="exec zsh"
 
 if [[ `uname` != "Darwin" ]]; then
