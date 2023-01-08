@@ -13,7 +13,17 @@ alias cl="clear"
 alias n="nvim"
 alias cat="bat"
 alias mux="tmuxinator"
-alias nz="nvim ~/.zshrc"
+alias nz="nvim ~/.zshrc_template && echo 'Regenerating .zshrc from .zshrc_template' && ${DOTFILES_PATH}/.scripts/zsh/generate-home-zshrc.sh"
 alias na="nvim ~/.zsh/aliases"
 alias nn="nvim ~/.config/nvim/init.lua"
 alias ez="exec zsh"
+
+if [[ `uname` != "Darwin" ]]; then
+	if [[ `which xsel 2> /dev/null` ]]; then
+		alias pbcopy='xsel --clipboard --input'
+		alias pbpaste='xsel --clipboard --output'
+	elif [[ `which xclip 2> /dev/null` ]]; then
+		alias pbcopy='xclip -selection clipboard'
+		alias pbpaste='xclip -selection clipboard -o'
+	fi
+fi
