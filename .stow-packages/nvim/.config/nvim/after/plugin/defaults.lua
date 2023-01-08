@@ -74,17 +74,17 @@ toggleterm.setup {
 }
 local toggle_terminal = function()
   local Terminal = require('toggleterm.terminal').Terminal
-  local float = Terminal:new({direction = "float"})
+  local float = Terminal:new({ direction = "float" })
   return float:toggle()
 end
 local toggle_lazygit = function()
   local Terminal = require('toggleterm.terminal').Terminal
-  local lazygit = Terminal:new({cmd = "lazygit", direction = "float"})
+  local lazygit = Terminal:new({ cmd = "lazygit", direction = "float" })
   return lazygit:toggle()
 end
 local toggle_lf = function()
   local Terminal = require('toggleterm.terminal').Terminal
-  local ranger = Terminal:new({cmd = "lf", direction = "float"})
+  local ranger = Terminal:new({ cmd = "lf", direction = "float" })
   return ranger:toggle()
 end
 
@@ -94,9 +94,9 @@ local opts = { prefix = "<leader>" }
 local mappings = {
   t = {
     name = "[t]oggle term",
-    l = {toggle_lazygit, '[l]azygit'},
-    t = {toggle_terminal, '[terminal]'},
-    f = {toggle_lf, '[f]ile manager'}
+    l = { toggle_lazygit, '[l]azygit' },
+    t = { toggle_terminal, '[terminal]' },
+    f = { toggle_lf, '[f]ile manager' }
   },
   s = {
     name = "[s]earch"
@@ -109,28 +109,33 @@ local mappings = {
   r = { ":!rspec . --color --format doc<CR>", "Rspec" },
   f = { ":Format<CR>", "Format" },
   i = { "m'gg=G''", "Indent" },
-  x = {":bdelete<cr>", "E[x]it Buffer"},
-  X = {":bdelete!<cr>", "Force e[X]it"},
-  q = {":q<cr>", "[q]uit"},
-  Q = {":q!<cr>", "Force [Q]uit"},
-  w = {":w<cr>", "[w]rite file"},
-  E = {":e ~/.config/nvim/init.lua<cr>", "[E]dit nvim config"},
+  x = { ":bdelete<cr>", "E[x]it Buffer" },
+  X = { ":bdelete!<cr>", "Force e[X]it" },
+  q = { ":q<cr>", "[q]uit" },
+  Q = { ":q!<cr>", "Force [Q]uit" },
+  w = { ":w<cr>", "[w]rite file" },
+  E = { ":e ~/.config/nvim/init.lua<cr>", "[E]dit nvim config" },
   p = {
     name = "[p]acker",
-    r = {":PackerClean<cr>", "[r]emove unused plugins"},
-    c = {":PackerCompile profile=true<cr>", "[c]ompile plugins"},
-    i = {":PackerInstall<cr>", "[i]nstall plugins"},
-    p = {":PackerProfile<cr>", "Packer [p]rofile"},
-    s = {":PackerSync<cr>", "[s]ync plugins"},
-    S = {":PackerStatus<cr>", "packer [S]tatus"},
-    u = {":PackerUpdate<cr>", "[u]pdate plugins"}
+    r = { ":PackerClean<cr>", "[r]emove unused plugins" },
+    c = { ":PackerCompile profile=true<cr>", "[c]ompile plugins" },
+    i = { ":PackerInstall<cr>", "[i]nstall plugins" },
+    p = { ":PackerProfile<cr>", "Packer [p]rofile" },
+    s = { ":PackerSync<cr>", "[s]ync plugins" },
+    S = { ":PackerStatus<cr>", "packer [S]tatus" },
+    u = { ":PackerUpdate<cr>", "[u]pdate plugins" }
   },
 }
-require('which-key').register(mappings, opts)
 
+require('which-key').register(mappings, opts)
 require('nvim-autopairs').setup({})
+
+-- Map 'jk', 'kj', 'jj', 'kk' to ESC
+for _, v in ipairs({ 'jk', 'kj' }) do
+  vim.keymap.set('i', v, '<ESC>', { noremap = true })
+end
 
 -- Settings
 vim.o.clipboard = "unnamedplus"
-vim.o.timeoutlen = 50
+vim.o.timeoutlen = 150
 vim.cmd [[colorscheme dracula]]
