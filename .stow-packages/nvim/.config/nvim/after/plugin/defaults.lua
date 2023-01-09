@@ -5,8 +5,16 @@ require('lualine').setup {
 }
 
 require('nvim-treesitter.configs').setup {
-  -- ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'typescript', 'help', 'html', 'javascript', 'java', 'ruby', 'graphql', 'markdown'  },
-  ensure_installed = 'all',
+  ensure_installed = {
+    'bash', 'regex', 'awk', 'diff', 'help', 'dockerfile',
+    'gitattributes', 'gitcomitt', 'git_rebase',
+    'html', 'css', 'scss',
+    'javascript', 'json', 'jq',
+    'typscript', 'tsx', 'graphql',
+    'yml', 'toml', 'markdown',
+    'c', 'cpp', 'go', 'rust',
+    'ruby', 'python', 'kotlin', 'java',
+  },
   incremental_selection = {
     enable = true,
     keymaps = {
