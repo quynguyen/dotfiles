@@ -1,0 +1,8 @@
+# Ignore everything in here in this directory,
+#   so that the Tmux Plugin Manager (TPM) can install plugins into this directory without polluting the git repo.
+#   This repo only needs to know about `tpm` and that's it.
+*
+
+# Except for:
+!.gitignore
+!.tpm
