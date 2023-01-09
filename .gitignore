@@ -1,1 +1,2 @@
 .stow-packages/nvim/.config/nvim/plugin/packer_compiled.lua
+.stow-packages/tmux/.tmux/plugins/extrakto
