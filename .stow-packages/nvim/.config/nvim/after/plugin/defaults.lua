@@ -6,6 +6,7 @@ require('lualine').setup {
 
 require('nvim-treesitter.configs').setup {
   ensure_installed = {
+    'lua', 'vim',
     'bash', 'regex', 'awk', 'diff', 'help', 'dockerfile',
     'gitattributes', 'gitcommit', 'git_rebase',
     'html', 'css', 'scss',
