@@ -6,11 +6,11 @@ require('lualine').setup {
 
 require("mason-lspconfig").setup {
   ensure_installed = { 
-    "bash-language-server", "bash-debug-adapter",
+    "bashls",
     "sumneko_lua", "rust_analyzer",
-    "ruby-lsp", "solargraph", "sorbet",
-    "typescript-language-server", "json-lsp",
-    "kotlin-language-server", "kotlin-debug-adapter",
+    "ruby_ls", "solargraph", "sorbet",
+    "tsserver", "jsonls", "cssls", "cssmodules_ls", "html",
+    "kotlin_language_server",
   },
 }
 
