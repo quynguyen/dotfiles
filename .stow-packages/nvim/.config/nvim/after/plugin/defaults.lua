@@ -4,6 +4,16 @@ require('lualine').setup {
   },
 }
 
+require("mason-lspconfig").setup {
+  ensure_installed = { 
+    "bash-language-server", "bash-debug-adapter",
+    "sumneko_lua", "rust_analyzer",
+    "ruby-lsp", "solargraph", "sorbet",
+    "typescript-language-server", "json-lsp",
+    "kotlin-language-server", "kotlin-debug-adapter",
+  },
+}
+
 require('nvim-treesitter.configs').setup {
   ensure_installed = {
     'lua', 'vim',
