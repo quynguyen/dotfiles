@@ -22,3 +22,5 @@ nix-env -iA nixpkgs.unzip
 nix-env -iA nixpkgs.cht-sh
 nix-env -iA nixpkgs.direnv
 nix-env -iA nixpkgs.ruby_3_1
+nix-env -iA nixpkgs.nodejs
+nix-env -iA nixpkgs.nodePackages.npm
