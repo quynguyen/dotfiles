@@ -7,5 +7,6 @@ if [[ ! -f ~/.tmux/plugins/tpm/bin/install_plugins ]]; then
 	~/.tmux/plugins/tpm/bin/install_plugins
 else
 	# Update plugins
+	git submodule update --recursive
 	~/.tmux/plugins/tpm/bin/update_plugins all
 fi
