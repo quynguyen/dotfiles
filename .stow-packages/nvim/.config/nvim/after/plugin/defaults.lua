@@ -5,7 +5,7 @@ require('lualine').setup {
 }
 
 require("mason-lspconfig").setup {
-  ensure_installed = { 
+  ensure_installed = {
     "bashls",
     "sumneko_lua", "rust_analyzer",
     "ruby_ls", "solargraph", "sorbet",
@@ -123,9 +123,12 @@ local mappings = {
   c = {
     name = "[c]ode"
   },
-  e = { ":!ruby %<CR>", "Execute Ruby" },
-  b = { ":!bundle exec rspec %<CR>", "Bundle exec" },
-  r = { ":!rspec . --color --format doc<CR>", "Rspec" },
+  e = {
+    name = "[e]xecute",
+    r = { ":!ruby %<CR>", "Execute Ruby" },
+    b = { ":!bundle exec rspec %<CR>", "Bundle exec" },
+    s = { ":!rspec . --color --format doc<CR>", "Rspec" },
+  },
   f = { ":Format<CR>", "Format" },
   i = { "m'gg=G''", "Indent" },
   x = { ":bdelete<cr>", "E[x]it Buffer" },
@@ -153,6 +156,12 @@ require('nvim-autopairs').setup({})
 for _, v in ipairs({ 'jk', 'kj' }) do
   vim.keymap.set('i', v, '<ESC>', { noremap = true })
 end
+
+-- Switch Windows (aka Panes)
+vim.api.nvim_set_keymap('n', '<C-h>', '<C-w>h', { noremap = true, silent = false })
+vim.api.nvim_set_keymap('n', '<C-j>', '<C-w>j', { noremap = true, silent = false })
+vim.api.nvim_set_keymap('n', '<C-k>', '<C-w>k', { noremap = true, silent = false })
+vim.api.nvim_set_keymap('n', '<C-l>', '<C-w>l', { noremap = true, silent = false })
 
 -- Settings
 vim.o.clipboard = "unnamedplus"
