@@ -7,7 +7,7 @@ require('lualine').setup {
 require("mason-lspconfig").setup {
   ensure_installed = {
     "bashls",
-    "sumneko_lua", "rust_analyzer",
+    "lua_ls", "rust_analyzer",
     "ruby_ls", "solargraph", "sorbet",
     "tsserver", "jsonls", "cssls", "cssmodules_ls", "html",
     "kotlin_language_server",
