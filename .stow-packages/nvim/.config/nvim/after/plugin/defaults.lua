@@ -1,11 +1,10 @@
-require('nvim-tree').setup {
+local tree = require('nvim-tree')
+tree.setup {
   filters = { custom = { '*.tmp', '.git' } },
   disable_netrw = true,
   hijack_netrw = true,
-  open_on_setup = true,
-  ignore_ft_on_setup = { 'dashboard' },
   open_on_tab = false,
-  hijack_cursor = true,
+--  hijack_cursor = true,
   update_cwd = true,
   update_focused_file = { enable = true, update_cwd = true, ignore_list = {} },
   system_open = {
@@ -15,7 +14,7 @@ require('nvim-tree').setup {
     args = {}
   },
   view = {
-    width = Vapour.plugins.nvim_tree.view_width,
+    width = 50,
     side = 'left',
     mappings = { custom_only = false, list = {} }
   },
@@ -24,6 +23,10 @@ require('nvim-tree').setup {
   }
 }
 
+-- Close Nvim-Tree automatically if it's the last buffer
+vim.api.nvim_create_autocmd({"QuitPre"}, {
+    callback = function() vim.cmd("NvimTreeClose") end,
+})
 
 require('lualine').setup {
   options = {
