@@ -1,3 +1,30 @@
+require('nvim-tree').setup {
+  filters = { custom = { '*.tmp', '.git' } },
+  disable_netrw = true,
+  hijack_netrw = true,
+  open_on_setup = true,
+  ignore_ft_on_setup = { 'dashboard' },
+  open_on_tab = false,
+  hijack_cursor = true,
+  update_cwd = true,
+  update_focused_file = { enable = true, update_cwd = true, ignore_list = {} },
+  system_open = {
+    -- the command to run this, leaving nil should work in most cases
+    cmd = nil,
+    -- the command arguments as a list
+    args = {}
+  },
+  view = {
+    width = Vapour.plugins.nvim_tree.view_width,
+    side = 'left',
+    mappings = { custom_only = false, list = {} }
+  },
+  renderer = {
+    indent_markers = { enable = true, icons = { corner = "└ ", edge = "│ ", none = "  " } }
+  }
+}
+
+
 require('lualine').setup {
   options = {
     theme = 'dracula',
@@ -123,8 +150,9 @@ local mappings = {
   c = {
     name = "[c]ode"
   },
-  e = {
-    name = "[e]xecute",
+  e = { ":NvimTreeToggle<cr>", "File Explorer" },
+  r = {
+    name = "[r]un",
     r = { ":!ruby %<CR>", "Execute Ruby" },
     b = { ":!bundle exec rspec %<CR>", "Bundle exec" },
     s = { ":!rspec . --color --format doc<CR>", "Rspec" },
