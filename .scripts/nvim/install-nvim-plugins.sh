@@ -1,1 +1,1 @@
-install-nvim-plugins-packer.sh
+install-nvim-plugins-lazyvim.sh
