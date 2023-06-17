@@ -19,6 +19,10 @@ alias nb="nvim ~/.zsh/bindings"
 alias nn="nvim ~/.config/nvim/init.lua"
 alias nx="nvim ~/dotfiles/.scripts/nix/install-nix-packages.sh"
 alias ez="exec zsh"
+alias gs="git status"
+alias gcm="git checkout main"
+alias gpr="git pull --rebase"
+alias log="git log --oneline --decorate --graph"
 
 if [[ `uname` != "Darwin" ]]; then
 	if [[ `which xsel 2> /dev/null` ]]; then
