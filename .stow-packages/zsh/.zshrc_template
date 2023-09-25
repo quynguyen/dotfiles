@@ -2,6 +2,13 @@
 
 ${REPLACE_warning}
 
+if [[ -z "${REPLACE_spin}" ]]; then
+  echo "Loading default SPIN zsh config"
+  source /etc/zsh/zshrc.default.inc.zsh
+fi
+
+echo "Loading custom SPIN zsh config"
+
 export DOTFILES_PATH="${REPLACE_dotfiles_path}"
 export REGENERATE_ZSHRC="${REPLACE_source}"
 
