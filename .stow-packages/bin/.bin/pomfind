@@ -1,0 +1,3 @@
+#!/bin/sh
+
+find . -iname 'pom.xml' -exec grep -Hn --colour=always $* {} \;

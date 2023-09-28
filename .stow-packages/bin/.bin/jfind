@@ -1,0 +1,3 @@
+#!/bin/sh
+
+find . -regextype 'egrep' -regex '.*jsp$|.*java$' -exec grep -Hn --colour=always "$1" {} \;

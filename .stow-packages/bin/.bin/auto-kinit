@@ -1,0 +1,4 @@
+#!/bin/sh
+
+fetchpass | kinit -f qnguyen@CS.AD.CENTRAL1.COM
+

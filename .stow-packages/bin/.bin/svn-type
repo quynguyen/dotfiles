@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# If not CVS, then check SVN
+if [ -z $tag ] && [ -d .svn ]; then
+  svn info | grep "URL:" | c 2 | sed -e "s#$REPO##g" |  sed -r -e 's#(.*)/(trunk|branches|tags).*#\1#g'
+fi ;

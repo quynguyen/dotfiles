@@ -1,0 +1,15 @@
+#!/bin/bash
+
+[ -z "$1" ] && echo "$(basename $0) feature [version]" && exit -1
+
+feature=$0;
+version=${1:-"0.0.0.0.0-SNAPSHOT"}
+archVersion=${MVN_ARCHETYPE_VERSION_UXP_INTEGRATION:-"1.0.4"}
+
+mvn archetype:generate \
+	-DarchetypeArtifactId=integration-archetype \
+	-DarchetypeGroupId=com.central1.uxp.feature.integration.archetype \
+	-DarchetypeVersion=${archVersion} \
+	-DgroupId=com.central1.uxp.feature.${feature} \
+	-DartifactId=integration \
+	-Dversion=${version}

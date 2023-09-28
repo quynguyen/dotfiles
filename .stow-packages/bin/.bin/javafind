@@ -1,0 +1,3 @@
+#!/bin/sh
+
+find . -regex '.*\b[A-Z]\w*\.java$' -type f -exec grep -Hn --colour=auto "$1" {} \;

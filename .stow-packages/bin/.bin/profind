@@ -1,0 +1,3 @@
+#!/bin/sh
+
+find . -iname 'profile.properties' -exec grep -Hn --colour=always "$*" {} \;

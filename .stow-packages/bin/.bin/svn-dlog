@@ -1,0 +1,2 @@
+#!/bin/sh
+svn log -r {`date -d yesterday +%F`}:{`date -d tomorrow +%F`} $@
