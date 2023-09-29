@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "********************************************************************************"
+echo "Installing Tmux plugins"
+echo "********************************************************************************"
+
 # Install or Update plugins
 if [[ ! -f ~/.tmux/plugins/tpm/bin/install_plugins ]]; then
 	# Install plugins

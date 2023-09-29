@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "********************************************************************************"
+echo "Generating ~/.zshrc from ~/.zshrc_template"
+echo "********************************************************************************"
+
 # Move any existing .zshrc
 if [[ -f ~/.zshrc ]] && [[ -z ~/.zshrc.old ]]; then
 	mv ~/.zshrc ~/.zshrc.old

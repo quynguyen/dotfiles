@@ -1,20 +1,20 @@
 #!/bin/bash
 
+echo "********************************************************************************"
+echo "Installing Nix packages"
+echo "********************************************************************************"
+
 if [[ -z "$SPIN" ]]; then
-  nix-env -iA nixpkgs.gnumake
-  nix-env -iA nixpkgs.gcc
-  nix-env -iA nixpkgs.git
-  nix-env -iA nixpkgs.zsh
-  nix-env -iA nixpkgs.tmux
-  nix-env -iA nixpkgs.neovim
-  nix-env -iA nixpkgs.unzip
-  nix-env -iA nixpkgs.ruby_3_1
-  nix-env -iA nixpkgs.nodejs
-  nix-env -iA nixpkgs.nodePackages.npm
-else
-  echo "********************************************************************************"
-  echo "This is a SPIN environment"
-  echo "********************************************************************************"
+	nix-env -iA nixpkgs.gnumake
+	nix-env -iA nixpkgs.gcc
+	nix-env -iA nixpkgs.git
+	nix-env -iA nixpkgs.zsh
+	nix-env -iA nixpkgs.tmux
+	nix-env -iA nixpkgs.neovim
+	nix-env -iA nixpkgs.unzip
+	nix-env -iA nixpkgs.ruby_3_1
+	nix-env -iA nixpkgs.nodejs
+	nix-env -iA nixpkgs.nodePackages.npm
 fi
 
 nix-env -iA nixpkgs.lazygit
