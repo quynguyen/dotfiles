@@ -15,7 +15,7 @@ echo "**************************************************************************
 
 export DOTFILES_PATH="${REPLACE_dotfiles_path}"
 export REGENERATE_ZSHRC="${REPLACE_source}"
-export PATH="~/.bin/:${REPLACE_path}"
+export PATH="${REPLACE_home}/.bin/:${REPLACE_path}"
 #
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]

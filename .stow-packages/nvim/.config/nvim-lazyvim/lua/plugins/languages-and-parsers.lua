@@ -1,29 +1,28 @@
 return {
   {
     "neovim/nvim-lspconfig",
-    ---@class PluginLspOpts
     opts = {
-      ---@type lspconfig.options
       servers = {
         -- pyright will be automatically installed with mason and loaded with lspconfig
-        bashls = {},
-        ruby_ls = {},
         solargraph = {},
-        kotlin_language_server = {},
         rust_analyzer = {},
         html = {},
       },
     },
   },
   {
-    "kylechui/nvim-surround",
-    version = "*", -- Use for stability; omit to use `main` branch for the latest features
-    event = "VeryLazy",
-    config = function()
-      require("nvim-surround").setup({
-        -- Configuration here, or leave empty to use defaults
-      })
-    end,
+    "echasnovski/mini.surround",
+    opts = {
+      mappings = {
+        add = "gsa",
+        delete = "gsd",
+        find = "gsf",
+        find_left = "gsF",
+        highlight = "gsh",
+        replace = "gsr",
+        update_n_lines = "gsn",
+      },
+    },
   },
   {
     "windwp/nvim-autopairs",
@@ -53,9 +52,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     opts = {
       ensure_installed = {
-        "lua",
         "vim",
-        "bash",
         "regex",
         "awk",
         "diff",
@@ -72,9 +69,6 @@ return {
         "toml",
         "markdown",
         "markdown_inline",
-        "c",
-        "cpp",
-        "go",
         "rust",
         "ruby",
         "python",
@@ -103,23 +97,4 @@ return {
       },
     },
   },
-  -- {
-  --   "mason-lspconfig",
-  --   opts = {
-  --     ensure_installed = {
-  --       "bashls",
-  --       "lua_ls",
-  --       "rust_analyzer",
-  --       "ruby_ls",
-  --       "solargraph",
-  --       "sorbet",
-  --       "tsserver",
-  --       "jsonls",
-  --       "cssls",
-  --       "cssmodules_ls",
-  --       "html",
-  --       "kotlin_language_server",
-  --     },
-  --   },
-  -- },
 }
