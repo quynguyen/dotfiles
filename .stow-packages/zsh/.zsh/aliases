@@ -23,6 +23,8 @@ alias gs="git status"
 alias gcm="git checkout main"
 alias gpr="git pull --rebase"
 alias log="git log --oneline --decorate --graph"
+alias dbp="dev cd business-platform"
+alias dshop="dev cd shopify"
 
 if [[ `uname` != "Darwin" ]]; then
 	if [[ `which xsel 2> /dev/null` ]]; then
