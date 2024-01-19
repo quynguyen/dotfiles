@@ -18,3 +18,13 @@ if [[ -f $github_copilot_secret ]]; then
 	[[ -d $github_copilot_config_path ]] || mkdir -p $github_copilot_config_path
 	ln -snvf $github_copilot_secret $github_copilot_config
 fi
+
+echo "********************************************************************************"
+echo "Setting the remote repo url on ~/dotfiles/"
+echo "********************************************************************************"
+
+# Set the remote URL for the repo
+git -C $HOME/dotfiles remote set-url origin git@github.com:quyify/dotfiles.git
+
+# Ouptput the remote URL
+git -C $HOME/dotfiles remote -v
