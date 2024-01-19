@@ -12,6 +12,9 @@ source .scripts/nix/install-nix-packages.sh
 # $HOME dotfiles
 source .scripts/stow/create-home-dotfile-symlinks.sh
 
+# SPIN settings
+source .scripts/spin/configure-spin.sh
+
 # Zsh plugins
 source .scripts/antibody/generated-zsh-plugins.sh
 
