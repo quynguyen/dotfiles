@@ -20,6 +20,8 @@ export REPLACE_file='$file'
 export REPLACE_p10k_home='${XDG_CACHE_HOME:-$HOME/.cache}'
 export REPLACE_p10k_prompt='${(%):-%n}'
 export REPLACE_path='${PATH}'
+export REPLACE_term='${TERM}'
+export REPLACE_tmux='${TMUX}'
 export REPLACE_warning=$(
 	cat <<-END
 		# !!!!! WARNING !!!!! 
