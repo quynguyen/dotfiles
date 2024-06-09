@@ -1,0 +1,184 @@
+"source ~/.vimrc
+
+
+Plug 'easymotion/vim-easymotion'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-commentary'
+Plug 'preservim/nerdtree'
+Plug 'vim-scripts/argtextobj.vim'
+Plug 'preservim/nerdtree'
+Plug 'terryma/vim-multiple-cursors'
+Plug 'vim-scripts/replacewithregister'
+Plug 'tommcdo/vim-exchange'
+Plug 'kana/vim-textobj-entire'
+Plug 'machakann/vim-highlightedyank'
+Plug 'dbakker/vim-paragraph-motion'
+Plug 'michaeljsmith/vim-indent-object'
+Plug 'chrisbra/matchit'
+
+set ideajoin
+
+" By default, with ideavim, during an IDE refactor, the text being refactored
+" is in command mode.  This is not intuitive.  This setting changes the
+" behavior so that the text being refactored is in insert mode.
+" That the option is named "select" is counter-intuitive, but it works;
+" Personally, I would have named the option "insert".
+set idearefactormode=select
+
+imap jj <Esc>
+imap jk <Esc>
+imap kj <Esc>
+
+let mapleader=" "
+
+" Some vimrc remaps from this crazy mofo -- only some of them work with
+" ideavim :(
+" https://www.youtube.com/watch?v=hSHATqh8svM
+"================================================================================================
+" Capital "D", and Capital "C" effects from the cursor to the end of the line.
+" Yet, Capital "Y" yanks the entire line.  Why?  Make "Y" yank from the cursor
+" until the end of the line
+nnoremap Y y$
+
+" When the cursor jumps during find
+ or joins, have the screen/camera track
+" the cursor, keeping the cursor in the middle.  This is a like the David
+" Fincher camera think, or keeping the subject centered in frame, even if the
+" subject is moving ever so slightly
+nnoremap n nzzzv
+nnoremap N Nzzzv
+nnoremap J mzJ`z
+
+"================================================================================
+" Vim IDE Remappings
+" Type the command ":actionlist" to see a full list of mappable IDE Actions
+" Or refer to this list:
+"   https://gist.github.com/zchee/9c78f91cc5ad771c1f5d
+"================================================================================
+nnoremap H :action PreviousTab<CR>
+nnoremap L :action NextTab<CR>
+nnoremap [t :action NextTab<CR>
+nnoremap ]t :action PreviousTab<CR>
+nnoremap gD :action GotoTypeDeclaration<CR>
+nnoremap gI :action QuickImplementations<CR>
+nnoremap gf :action Find<CR>
+nnoremap <c-o> :action Back<CR>
+nnoremap <c-t> :action Forward<CR>
+
+:map <leader>b <Action>(ToggleLineBreakPoint)
+:map <leader>e <Action>(ShowErrorDescription)
+:map <leader>d <Action>(Debug)
+:map <leader>r <Action>(ReformatCode)
+"================================================================================
+" Neo Vim
+"================================================================================
+nnoremap <leader>f <cmd>Telescope find_files<cr>
+
+
+"================================================================================
+" Lifted from:
+"  https://towardsdatascience.com/the-essential-ideavim-remaps-291d4cd3971b
+"================================================================================
+
+" Editing and Reloading the Config
+set clipboard+=unnamed
+set clipboard+=ideaput
+nnoremap \e :e ~/.ideavimrc<CR>
+nnoremap \r :action IdeaVim.ReloadVimRc.reload<CR>
+""" The Escape button
+map <C-c> <Esc>
+""" The Leader Key
+let mapleader=" "
+""" Distraction Free Mode
+nnoremap <c-z> :action ToggleDistractionFreeMode<CR>
+""" Terminal
+"nnoremap <c-t> :action ActivateTerminalToolWindow<CR>
+nnoremap <leader>t :action ActivateTerminalToolWindow<CR>
+nnoremap <leader>T :action Terminal.OpenInTerminal<CR>
+""" Navigation
+nnoremap <c-\> :action SplitVertically<CR>
+nnoremap <c--> :action SplitHorizontally<CR>
+nnoremap <c-=> :action Unsplit<CR>
+nnoremap <c-m> :action MoveEditorToOppositeTabGroup<CR>
+nnoremap <m-h> <c-w>h
+nnoremap <m-l> <c-w>l
+nnoremap <m-j> <c-w>j
+nnoremap <m-k> <c-w>k
+nnoremap <TAB> :action PreviousTab<CR>
+nnoremap <s-TAB> :action NextTab<CR>
+nnoremap <Leader>en :action EditSourceInNewWindow<CR>
+nnoremap <Leader>n :action NextWindow<CR>
+nnoremap <Leader>x :action CloseContent<CR>
+nnoremap <Leader>q :action CloseAllEditors<CR>
+""" Editing source code
+set ideajoin
+set idearefactormode=keep
+vnoremap < <gv
+vnoremap > >gv
+nnoremap [[ :action MethodUp<CR>
+nnoremap ]] :action MethodDown<CR>
+nnoremap zc :action CollapseRegion<CR>
+nnoremap zo :action ExpandRegion<CR>
+nnoremap <leader>zc :action CollapseAllRegions<CR>
+nnoremap <leader>zo :action ExpandAllRegions<CR>
+nnoremap <leader>c :action CommentByLineComment<CR>
+nnoremap <leader>r :action Refactorings.QuickListPopupAction<CR>
+nnoremap <Leader>=  :action ReformatCode<CR>
+nnoremap <leader>o :action OptimizeImports<CR>
+nnoremap <m-e> :action RecentFiles<CR>
+nnoremap <leader>l :action RecentLocations<CR>
+nnoremap <leader>h  :action LocalHistory.ShowHistory<CR>
+nnoremap [e :action GotoPreviousError<CR>
+nnoremap ]e :action GotoNextError<CR>
+nnoremap <leader>s :write<CR>
+""" Searching and Source Code Navigation
+set incsearch
+nnoremap <c-/> :action FindInPath<CR>
+nnoremap <c-a> :action GotoAction<CR>
+nnoremap <c-f> :action GotoFile<CR>
+nnoremap <leader>u :action FindUsages<CR>
+nnoremap <leader>s :action GotoRelated<CR>
+nnoremap <leader>h :action CallHierarchy<CR>
+nnoremap <leader>H :action TypeHierarchy<CR>
+nnoremap <leader>b :action ShowNavBar<CR>
+nnoremap <c-s> :action FileStructurePopup<CR>
+nnoremap <c-y> :action GotoSymbol<CR>
+nnoremap gc :action GotoClass<CR>
+nnoremap gr :action GotoRelated<CR>
+nnoremap gi :action GotoImplementation<CR>
+nnoremap gd :action GotoDeclaration<CR>
+nnoremap gs :action GotoSuperMethod<CR>
+nnoremap gt :action GotoTest<CR>
+"nnoremap g[ :action Back<CR>
+"nnoremap g] :action Forward<CR>
+""" Tool windows
+"nnoremap <c-l> :action JumpToLastWindow<CR>
+nnoremap <c-x> :action HideAllWindows<CR>
+""" Running and Debugging
+nnoremap ,r :action ContextRun<CR>
+nnoremap ,c :action RunToCursor<CR>
+nnoremap ,f :action ChooseRunConfiguration<CR>
+nnoremap ,t :action ActivateRunToolWindow<CR>
+nnoremap ,u :action Rerun<CR
+nnoremap ,f :action RerunFailedTests<CR>
+nnoremap ,b :action ToggleLineBreakpoint<CR>
+nnoremap ,d :action ContextDebug<CR>
+nnoremap ,n :action ActivateDebugToolWindow<CR>
+
+"================================================================================
+" Unimpaired-style from:
+" https://github.com/kaHaleMaKai/ideavim-settings/blob/master/.ideavimrc
+"================================================================================
+nnoremap [<space> O<esc>j
+nnoremap ]<space> o<esc>k
+nnoremap [q :action PreviousOccurence<cr>
+nnoremap ]q :action NextOccurence<cr>
+nnoremap [m :action MethodUp<cr>
+nnoremap ]m :action MethodDown<cr>
+nnoremap [c :action VcsShowPrevChangeMarker<cr>
+nnoremap ]c :action VcsShowNextChangeMarker<cr>
+
+" templates
+inoremap <C-k>:action NextTemplateVariable<CR>
+inoremap <C-j>:action PreviousTemplateVariable<CR>
+

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+CMD=/opt/openconnect/openconnect
+CERT_FILE=/opt/openconnect/desktop-linux-cert.pfx
+KEY=$(fetchkey)
+
+if [ ! -e "$CMD" ]; then
+	echo "Quy's, you's missing the command the Global Protect Software, $CMD"
+	echo "See https://wiki.central1.com/confluence/display/helpdesk/HD+Palo+Alto+-+Global+Protect#HDPaloAlto-GlobalProtect-SetuponUbuntu"
+	exit -1
+fi
+
+if [ ! -f "$CERT_FILE" ]; then
+	echo "Quy, you's is missing your Central 1 Certificate: $CERT_FILE"
+	exit -1
+fi
+
+fetchpass | sudo $CMD --user=qnguyen --protocol=gp remote.central1.com --certificate $CERT_FILE --key-password=$KEY

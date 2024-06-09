@@ -1,0 +1,3 @@
+#!/bin/sh
+
+jcmd 0 GC.run

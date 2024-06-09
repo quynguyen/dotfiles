@@ -1,0 +1,100 @@
+#!/bin/bash
+
+CLASS=$1
+TMPFILE=/tmp/find-class-$PPID
+TMPDIR=/tmp/find-class-archives-$PPID
+
+function searchJars()
+{
+    local baseDir=$1
+    local class=$2
+    local outterContainer=$3
+    find $baseDir -iname '*.jar' | while read jar; do 
+        jar -tvf $jar | if grep $class > $TMPFILE; then
+           if [ -n $outterContainer ]; then
+               echo "------ Found matches in ${outterContainer}::${jar} ------"
+           else
+               echo "------ Found matches in jar file: $jar ------"
+           fi
+           cat $TMPFILE
+        fi
+    done
+}
+
+function searchWars()
+{
+    local baseDir=$1
+    local class=$2
+    find $baseDir -type f -iname '*.war' | while read war; do
+        #find a place to unzip the archive
+        dirName=$TMPDIR/$(basename $war);
+        i=1;
+        while [ -d $dirName ]; do
+            dirName=$dirName$((i++));
+        done
+        mkdir -p $dirName
+
+        unzip -qq $war -d $dirName
+        searchJars $dirName $class $war
+    done
+}
+
+function searchSars()
+{
+    local baseDir=$1
+    local class=$2
+    find $baseDir -type f -iname '*.sar' | while read sar; do
+        #find a place to unzip the archive
+        dirName=$TMPDIR/$(basename $sar);
+        i=1;
+        while [ -d $dirName ]; do
+            dirName=$dirName$((i++));
+        done
+        mkdir -p $dirName
+
+        unzip -qq $sar -d $dirName
+        searchJars $dirName $class $sar
+        searchWars $dirName $class $sar
+    done
+}
+
+
+function searchEars()
+{
+    local baseDir=$1
+    local class=$2
+    find $baseDir -type f -iname '*.ear' | while read ear; do
+        #find a place to unzip the archive
+        dirName=$TMPDIR/$(basename $ear);
+        i=1;
+        while [ -d $dirName ]; do
+            dirName=$dirName$((i++));
+        done
+        mkdir -p $dirName
+
+        unzip -qq $ear -d $dirName
+        searchJars $dirName $class $sar
+        searchWars $dirName $class $sar
+        searchSars $dirName $class $sar
+    done
+}
+    
+
+function searchClassesDirectory()
+{
+    local baseDir=$1
+    local class=$2
+    find $baseDir -type d -iname 'classes' | while read classesDir; do
+        find $classesDir -type f -iname '*.class' | if grep $class > $TMPFILE; then
+            echo "------ Found matches in classes directory: $classDir ------"
+            cat $TMPFILE
+        fi
+    done
+}
+
+searchJars $PWD $CLASS
+searchClassesDirectory $PWD $CLASS
+searchWars $PWD $CLASS
+
+[ -f $TMPFILE ] && rm $TMPFILE
+[

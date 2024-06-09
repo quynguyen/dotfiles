@@ -1,5 +1,19 @@
 #!/bin/bash
 
+if [[ -n "$SPIN" ]]; then
+	echo "********************************************************************************"
+	echo "This is a SPIN environment.  Sourcing existing Nix install"
+	echo "********************************************************************************"
+
+	# Source Nix
+	source ~/.nix-profile/etc/profile.d/nix.sh
+	return 0
+fi
+
+echo "********************************************************************************"
+echo "Installing/Updating Nix"
+echo "********************************************************************************"
+
 set -e
 
 # install nix (if not already installed)

@@ -1,9 +1,0 @@
-# vim: set ft=zsh
-
-export NVM_DIR=${HOME}/.nvm
-export NVM_COMPLETION=true
-export LESSOPEN="| $(which src-hilite-lesspipe.sh) %s"
-export LESS="-R"
-export EDITOR="$(which nvim)"
-export PAGER="$(which nvimpager)"
-export MANPAGER="$(which nvimpager)"

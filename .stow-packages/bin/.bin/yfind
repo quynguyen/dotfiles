@@ -1,0 +1,3 @@
+#!/bin/sh
+
+find . -iname '*.yml' -exec grep -Hn --colour=always $* {} \;

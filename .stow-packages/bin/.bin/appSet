@@ -1,0 +1,24 @@
+#!/bin/bash
+
+[ $# -eq 2 ] || {
+	echo "$0 <app name> <version>"
+	exit 1
+}
+
+app=$1
+version=$2
+appPath=$APPS/$app
+
+[ -d $appPath ] || {
+	echo "$1 doesn't exist"
+	exit 1
+}
+
+sourceLink=$APPSTORE/$app-$version
+
+[ -d $sourceLink ] || {
+	echo "$sourceLink doesn't exist"
+	exit 1
+}
+
+ln -vsnf $sourceLink $appPath

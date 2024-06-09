@@ -1,0 +1,38 @@
+#!/bin/bash
+
+[ $# -eq 3 ] || {
+	echo "$0 <app path> <version number> <app name>"
+	exit 1
+}
+
+[ -d $1 ] || {
+	echo "$1 doesn't exist"
+	exit 1
+}
+
+appPath=$1
+instance=$(basename $appPath)
+version=$2
+app=$3
+
+versionDir=.versions/$app/$version
+installDir=$APPSTORE/$versionDir
+newAppPath=$installDir/$instance
+
+[ -e $newAppPath ] && {
+	echo "$newAppPath already exists."
+	exit 1
+}
+
+mkdir -v --parents $installDir
+mv -v $appPath $newAppPath
+
+installLink=$app-$version
+
+pushd $APPSTORE > /dev/null
+ln -vsnf $versionDir/$instance $installLink
+popd > /dev/null
+
+pushd $APPS  > /dev/null
+ln -vsnf $APPSTORE/$installLink $app
+popd > /dev/null

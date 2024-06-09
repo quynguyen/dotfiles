@@ -1,0 +1,7 @@
+#!/bin/sh
+
+path=${1:-"."}
+
+echo "The path is $path"
+
+find $path -mindepth 1 -type d -exec sh -c '(ls -p "{}"|grep />/dev/null)||echo "{}"' \; 

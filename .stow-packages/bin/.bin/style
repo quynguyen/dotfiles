@@ -1,0 +1,7 @@
+#!/bin/bash
+
+git status --porcelain | grep -v '^R' | awk '{print $2}' | while read name; do
+	echo "Cleaning up: $name"
+	echo
+	/opt/dev/bin/dev style $name
+done

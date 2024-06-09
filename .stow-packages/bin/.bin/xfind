@@ -1,0 +1,3 @@
+#!/bin/sh
+
+find . -iname '*.xml' -exec grep -Hn --colour=always $* {} \;

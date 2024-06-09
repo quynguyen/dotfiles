@@ -1,0 +1,3 @@
+#!/bin/sh
+
+sudo cat /etc/samba/domain.passwd | grep password | sed -e "s/password=//g"
