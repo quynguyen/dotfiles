@@ -1,0 +1,15 @@
+# Logseq session and cache files
+.DS_Store
+bak/
+pages-metadata.edn
+.logseq/graphs-txid.edn
+.logseq/.recycle/
+.logseq/graphs/
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Log files
+*.log

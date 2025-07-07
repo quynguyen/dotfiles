@@ -1,0 +1,5 @@
+{:logseq-vim-shortcuts {:version "v0.1.22", :repo "vipzhicheng/logseq-plugin-vim-shortcuts", :effect true, :theme false}
+ :logseq-copy-code-plugin {:version "v.1.2.0", :repo "vyleung/logseq-copy-code-plugin", :effect true, :theme false}
+ :logseq-dracula-theme {:version "0.0.5", :repo "dracula/logseq", :effect false, :theme true}
+ :logseq-dev-theme {:version "v1.26.17", :repo "pengx17/logseq-dev-theme", :effect false, :theme true}
+ :logseq-bonofix-theme {:version "v3.10.5", :repo "sansui233/logseq-bonofix-theme", :effect false, :theme true}}

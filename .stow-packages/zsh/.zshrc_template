@@ -2,26 +2,34 @@
 
 ${REPLACE_warning}
 
-if [[ -n "${REPLACE_spin}" ]]; then
-  echo "********************************************************************************"
-  echo "Loading default SPIN .zshrc: /etc/zsh/zshrc.default.inc.zsh"
-  echo "********************************************************************************"
-  source /etc/zsh/zshrc.default.inc.zsh
-fi
-
 echo "********************************************************************************"
-echo "Loading custom SPIN zsh config"
+echo "Loading custom zsh config"
 echo "********************************************************************************"
 
 export DOTFILES_PATH="${REPLACE_dotfiles_path}"
 export REGENERATE_ZSHRC="${REPLACE_source}"
 export PATH="${REPLACE_home}/.bin/:${REPLACE_path}"
-#
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${REPLACE_p10k_home}/p10k-instant-prompt-${REPLACE_p10k_prompt}.zsh" ]]; then
-  source "${REPLACE_p10k_home}/p10k-instant-prompt-${REPLACE_p10k_prompt}.zsh"
+# Load shell configuration to determine prompt type
+if [[ -f ~/.shell_config ]]; then
+  source ~/.shell_config
+fi
+
+# Set default if not configured
+DOTFILES_SHELL_MODE="${DOTFILES_SHELL_MODE:-zsh-p10k}"
+
+# Configure prompt based on shell mode
+if [[ "${REPLACE_dotfiles_shell_mode}" == "zsh-p10k" ]]; then
+  # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+  # Initialization code that may require console input (password prompts, [y/n]
+  # confirmations, etc.) must go above this block; everything else may go below.
+  if [[ -r "${REPLACE_p10k_home}/p10k-instant-prompt-${REPLACE_p10k_prompt}.zsh" ]]; then
+    source "${REPLACE_p10k_home}/p10k-instant-prompt-${REPLACE_p10k_prompt}.zsh"
+  fi
+elif [[ "${REPLACE_dotfiles_shell_mode}" == "zsh-starship" ]]; then
+  # Initialize Starship prompt
+  if command -v starship &> /dev/null; then
+    eval "$(starship init zsh)"
+  fi
 fi
 
 # `lf` -- This is a commandline file explorer [[ -f ~/.config/lf/lfcd.sh ]] && source ~/.config/lf/lfcd.sh
@@ -34,26 +42,42 @@ done
 # Load plugins
 source ~/.zsh_plugins.sh
 
-if [[ -n "${REPLACE_spin}" ]]; then
-#  echo "********************************************************************************"
-#  echo "Ensuring gitstatus installed"
-#  echo "********************************************************************************"
-#  ~/.cache/antibody/https-COLON--SLASH--SLASH-github.com-SLASH-romkatv-SLASH-powerlevel10k/gitstatus/install -f
+ echo "********************************************************************************"
+ echo "Loading Homebrew"
+ echo "********************************************************************************"
+
+# Load Homebrew
+if [[ "${REPLACE_ostype}" == "darwin"* ]]; then
+  if [[ -f "/opt/homebrew/bin/brew" ]]; then
+    # Apple Silicon
+    export PATH="/opt/homebrew/bin:$PATH"
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -f "/usr/local/bin/brew" ]]; then
+    # Intel
+    export PATH="/usr/local/bin:$PATH"
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+else
+  # Linux
+  if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
+    export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  fi
 fi
-
- echo "********************************************************************************"
- echo "Loading Nix"
- echo "********************************************************************************"
-
-# Load Nix
-if [ -e ${REPLACE_home}/.nix-profile/etc/profile.d/nix.sh ]; then . ${REPLACE_home}/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
  echo "********************************************************************************"
  echo "Loading prompt (Ctrl-X if taking too long...)"
  echo "********************************************************************************"
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# Configure prompt specific settings
+if [[ "${REPLACE_dotfiles_shell_mode}" == "zsh-p10k" ]]; then
+  # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+  [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+elif [[ "${REPLACE_dotfiles_shell_mode}" == "zsh-starship" ]]; then
+  # Disable Powerlevel10k configuration wizard when using Starship
+  export POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
+  echo "Using Starship prompt"
+fi
 
 
  echo "********************************************************************************"
@@ -69,3 +93,15 @@ echo "TERM: ${REPLACE_term}"
 
 # For Spin
 [[ -f /opt/dev/dev.sh ]] && source /opt/dev/dev.sh
+
+ echo "********************************************************************************"
+ echo "Initializing zoxide (smart directory navigation)"
+ echo "********************************************************************************"
+
+# Initialize zoxide for smart directory navigation
+if command -v zoxide &> /dev/null; then
+  eval "$(zoxide init zsh)"
+  echo "zoxide initialized - use 'z <dir>' to navigate quickly"
+else
+  echo "zoxide not found - install with: brew install zoxide"
+fi

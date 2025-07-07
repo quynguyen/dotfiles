@@ -1,0 +1,5 @@
+# Shell configuration for dotfiles
+# This file stores your preferred shell mode
+# Valid options: zsh-p10k, zsh-starship, fish, nushell
+
+DOTFILES_SHELL_MODE="fish"

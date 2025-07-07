@@ -1,0 +1,296 @@
+#!/bin/bash
+
+# Shell switching utility for dotfiles
+# Usage: shell [shell-mode]
+# If no arguments provided, uses fzf to select interactively
+
+set -euo pipefail
+
+DOTFILES_PATH="${DOTFILES_PATH:-$HOME/dotfiles}"
+# Write to the stow source instead of the symlink target
+SHELL_CONFIG_FILE="$DOTFILES_PATH/.stow-packages/shell/.shell_config"
+
+# Available shell modes with descriptions
+declare -a SHELL_MODES=(
+    "zsh-p10k:Zsh with Powerlevel10k (current default)"
+    "zsh-starship:Zsh with Starship theme (modern, fast)"
+    "fish:Fish shell (auto-suggestions, fast)"
+    "nushell:Nushell (structured data shell)"
+)
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to display usage
+usage() {
+    echo "Usage: shell [shell-mode]"
+    echo ""
+    echo "Available shell modes:"
+    for mode in "${SHELL_MODES[@]}"; do
+        IFS=':' read -r name desc <<< "$mode"
+        printf "  %-15s %s\n" "$name" "$desc"
+    done
+    echo ""
+    echo "If no shell-mode is provided, an interactive menu will be shown."
+}
+
+# Function to get current shell mode
+get_current_mode() {
+    if [[ -f "$SHELL_CONFIG_FILE" ]]; then
+        grep "^DOTFILES_SHELL_MODE=" "$SHELL_CONFIG_FILE" | cut -d'=' -f2 | tr -d '"'
+    else
+        echo "zsh-p10k"
+    fi
+}
+
+# Function to set shell mode
+set_shell_mode() {
+    local mode="$1"
+    
+    # Create shell config if it doesn't exist
+    if [[ ! -f "$SHELL_CONFIG_FILE" ]]; then
+        echo "# Shell configuration for dotfiles" > "$SHELL_CONFIG_FILE"
+        echo "# This file stores your preferred shell mode" >> "$SHELL_CONFIG_FILE"
+        echo "# Valid options: zsh-p10k, zsh-starship, fish, nushell" >> "$SHELL_CONFIG_FILE"
+        echo "" >> "$SHELL_CONFIG_FILE"
+    fi
+    
+    # Update the mode - handle symlinks by writing to a temp file first
+    local temp_file=$(mktemp)
+    if grep -q "^DOTFILES_SHELL_MODE=" "$SHELL_CONFIG_FILE"; then
+        sed "s/^DOTFILES_SHELL_MODE=.*/DOTFILES_SHELL_MODE=\"$mode\"/" "$SHELL_CONFIG_FILE" > "$temp_file"
+        mv "$temp_file" "$SHELL_CONFIG_FILE"
+    else
+        cp "$SHELL_CONFIG_FILE" "$temp_file"
+        echo "DOTFILES_SHELL_MODE=\"$mode\"" >> "$temp_file"
+        mv "$temp_file" "$SHELL_CONFIG_FILE"
+    fi
+}
+
+# Function to install required packages for a shell mode
+install_packages() {
+    local mode="$1"
+    
+    echo -e "${BLUE}Installing packages for $mode...${NC}"
+    
+    # Source package management functions
+    if [[ -f "$DOTFILES_PATH/.scripts/package-management/initialize-packages.sh" ]]; then
+        source "$DOTFILES_PATH/.scripts/package-management/initialize-packages.sh"
+        
+        # Determine package manager
+        local package_manager
+        package_manager=$(get_package_manager)
+        
+        # Install shell-specific packages
+        install_shell_packages "$mode" "$package_manager"
+    else
+        echo -e "${YELLOW}Warning: Package management script not found${NC}"
+        echo -e "${BLUE}Skipping package installation${NC}"
+    fi
+}
+
+# Function to configure the selected shell
+configure_shell() {
+    local mode="$1"
+    
+    echo -e "${BLUE}Configuring $mode...${NC}"
+    
+    case "$mode" in
+        "zsh-p10k"|"zsh-starship")
+            # Regenerate zshrc with new mode
+            "$DOTFILES_PATH/.scripts/zsh/generate-home-zshrc.sh"
+            ;;
+        "fish")
+            # Create fish config if needed
+            if [[ ! -f "$HOME/.config/fish/config.fish" ]]; then
+                mkdir -p "$HOME/.config/fish"
+                if [[ -f "$DOTFILES_PATH/.stow-packages/fish/.config/fish/config.fish" ]]; then
+                    ln -sf "$DOTFILES_PATH/.stow-packages/fish/.config/fish/config.fish" "$HOME/.config/fish/config.fish"
+                fi
+            fi
+            ;;
+        "nushell")
+            # Create nushell config if needed
+            if [[ ! -f "$HOME/.config/nushell/config.nu" ]]; then
+                mkdir -p "$HOME/.config/nushell"
+                if [[ -f "$DOTFILES_PATH/.stow-packages/nushell/.config/nushell/config.nu" ]]; then
+                    ln -sf "$DOTFILES_PATH/.stow-packages/nushell/.config/nushell/config.nu" "$HOME/.config/nushell/config.nu"
+                fi
+            fi
+            ;;
+    esac
+}
+
+# Function to optionally set as default shell
+set_default_shell() {
+    local mode="$1"
+    
+    case "$mode" in
+        "zsh-p10k"|"zsh-starship")
+            if [[ "$SHELL" != *"zsh" ]]; then
+                echo -e "${YELLOW}Would you like to set Zsh as your default shell? [y/N]${NC}"
+                read -r response
+                if [[ "$response" =~ ^[Yy]$ ]]; then
+                    chsh -s "$(which zsh)"
+                    echo -e "${GREEN}Default shell changed to Zsh${NC}"
+                fi
+            fi
+            ;;
+        "fish")
+            if [[ "$SHELL" != *"fish" ]]; then
+                echo -e "${YELLOW}Would you like to set Fish as your default shell? [y/N]${NC}"
+                read -r response
+                if [[ "$response" =~ ^[Yy]$ ]]; then
+                    # Add fish to valid shells if not already there
+                    if ! grep -q "$(which fish)" /etc/shells; then
+                        echo "$(which fish)" | sudo tee -a /etc/shells > /dev/null
+                    fi
+                    chsh -s "$(which fish)"
+                    echo -e "${GREEN}Default shell changed to Fish${NC}"
+                fi
+            fi
+            ;;
+        "nushell")
+            if [[ "$SHELL" != *"nu" ]]; then
+                echo -e "${YELLOW}Would you like to set Nushell as your default shell? [y/N]${NC}"
+                read -r response
+                if [[ "$response" =~ ^[Yy]$ ]]; then
+                    # Add nushell to valid shells if not already there
+                    if ! grep -q "$(which nu)" /etc/shells; then
+                        echo "$(which nu)" | sudo tee -a /etc/shells > /dev/null
+                    fi
+                    chsh -s "$(which nu)"
+                    echo -e "${GREEN}Default shell changed to Nushell${NC}"
+                fi
+            fi
+            ;;
+    esac
+}
+
+# Function to switch to a shell mode
+switch_to_mode() {
+    local mode="$1"
+    local current_mode
+    current_mode=$(get_current_mode)
+    
+    if [[ "$mode" == "$current_mode" ]]; then
+        echo -e "${YELLOW}Already configured for $mode${NC}"
+        echo -e "${BLUE}🔄 Switching to $mode shell...${NC}"
+        
+        # Still switch to the shell even if already configured
+        if [[ -f "$DOTFILES_PATH/.scripts/shells/reload_shell.sh" ]]; then
+            exec "$DOTFILES_PATH/.scripts/shells/reload_shell.sh"
+        fi
+        return 0
+    fi
+    
+    echo -e "${GREEN}Switching from $current_mode to $mode...${NC}"
+    
+    # Install required packages
+    install_packages "$mode"
+    
+    # Set the mode
+    set_shell_mode "$mode"
+    
+    # Configure the shell
+    configure_shell "$mode"
+    
+    # Optionally set as default shell
+    set_default_shell "$mode"
+    
+    echo -e "${GREEN}✅ Switched to $mode successfully!${NC}"
+    echo -e "${BLUE}🔄 Switching to $mode shell...${NC}"
+    
+    # Automatically switch to the new shell
+    if [[ -f "$DOTFILES_PATH/.scripts/shells/reload_shell.sh" ]]; then
+        exec "$DOTFILES_PATH/.scripts/shells/reload_shell.sh"
+    else
+        echo -e "${YELLOW}Warning: Could not find reload_shell.sh script${NC}"
+        echo -e "${BLUE}💡 To activate manually, run: exec shell $mode${NC}"
+    fi
+}
+
+# Function to show interactive menu with fzf
+show_interactive_menu() {
+    if ! command -v fzf &> /dev/null; then
+        echo -e "${RED}Error: fzf is required for interactive mode${NC}"
+        echo "Please install fzf: brew install fzf"
+        exit 1
+    fi
+    
+    local current_mode
+    current_mode=$(get_current_mode)
+    
+    # Create menu options with current selection highlighted
+    local menu_options=()
+    for mode in "${SHELL_MODES[@]}"; do
+        IFS=':' read -r name desc <<< "$mode"
+        if [[ "$name" == "$current_mode" ]]; then
+            menu_options+=("$name:$desc (current)")
+        else
+            menu_options+=("$name:$desc")
+        fi
+    done
+    
+    # Show fzf menu
+    local selected
+    selected=$(printf '%s\n' "${menu_options[@]}" | \
+               fzf --height=40% \
+                   --border \
+                   --prompt="Select shell mode: " \
+                   --preview='echo {}' \
+                   --preview-window='right:50%' \
+                   --header="Current: $current_mode" \
+                   --reverse)
+    
+    if [[ -n "$selected" ]]; then
+        local selected_mode
+        selected_mode=$(echo "$selected" | cut -d':' -f1)
+        switch_to_mode "$selected_mode"
+    else
+        echo -e "${YELLOW}No selection made${NC}"
+        exit 0
+    fi
+}
+
+# Function to validate shell mode
+validate_mode() {
+    local mode="$1"
+    for valid_mode in "${SHELL_MODES[@]}"; do
+        IFS=':' read -r name _ <<< "$valid_mode"
+        if [[ "$name" == "$mode" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+# Main function
+main() {
+    case "${1:-}" in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        "")
+            show_interactive_menu
+            ;;
+        *)
+            local mode="$1"
+            if validate_mode "$mode"; then
+                switch_to_mode "$mode"
+            else
+                echo -e "${RED}Error: Invalid shell mode '$mode'${NC}"
+                echo ""
+                usage
+                exit 1
+            fi
+            ;;
+    esac
+}
+
+main "$@"

@@ -1,0 +1,25 @@
+format = """\
+[](bg:none fg:#bcbcbc)\
+[](bg:#bcbcbc fg:#282A36)\
+[](fg:#bcbcbc bg:#c792ea)\
+$directory\
+[](fg:#c792ea bg:#fce94f)\
+$git_branch$git_status\
+[](fg:#fce94f bg:none)$character\
+"""
+
+[directory]
+format = "[ 󰉋 $path ]($style)"
+style = "fg:#ffffff bg:#c792ea"
+
+[git_branch]
+format = "[  $branch ]($style)"
+style = "fg:#282A36 bg:#fce94f"
+
+[git_status]
+format = "[ $all_status ]($style)"
+style = "fg:#282A36 bg:#fce94f"
+
+[character]
+success_symbol = '[ ➜](bold #50fa7b)'
+error_symbol = '[ ✗](bold #ff5555)'

@@ -1,0 +1,23 @@
+{
+  "cleanupPeriodDays": 365,
+  "env": {},
+  "mcpServers": {
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "open-memory": {
+      "args": [
+        "-y",
+        "supergateway",
+        "--sse",
+        "http://localhost:8765/mcp/claude/sse/quy"
+      ],
+      "command": "npx"
+    }
+  },
+  "permissions": {
+    "allow": [],
+    "deny": []
+  }
+}

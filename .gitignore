@@ -1,3 +1,5 @@
 .stow-packages/nvim/.config/nvim/plugin/packer_compiled.lua
 .stow-packages/lazygit/.config/lazygit/state.yml
 .stow-packages/tmux/.tmux/plugins/extrakto
+CLAUDE.md
+.claude/settings.local.json

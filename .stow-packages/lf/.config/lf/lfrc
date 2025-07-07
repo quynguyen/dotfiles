@@ -5,7 +5,10 @@ set hidden false
 
 set info size:time
 
-set previewer ~/.nix-profile/bin/src-hilite-lesspipe.sh
+# Set previewer based on package manager
+# For Homebrew: use $(brew --prefix)/bin/src-hilite-lesspipe.sh
+# For Nix (SPIN): use ~/.nix-profile/bin/src-hilite-lesspipe.sh
+set previewer src-hilite-lesspipe.sh
 
 # set '-eu' options for shell commands
 # These options are used to have safer shell commands. Option '-e' is used to

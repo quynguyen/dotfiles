@@ -1,0 +1,22 @@
+# Ghostty Configuration
+# Moved from Application Support to ~/.config/ghostty/ for better dotfiles management
+
+# Font Configuration
+font-family = "JetBrainsMono Nerd Font"
+font-size = 20
+
+# Shell Configuration
+command = /opt/homebrew/bin/fish
+
+# Key Bindings Configuration
+# ==========================
+# Left Option key acts as Alt/Meta (for tmux bindings like M-h, M-j, M-k, M-l)
+# Right Option key preserves Unicode input capability
+macos-option-as-alt = left
+
+# Note: Alt+left/right provide useful directory navigation in Fish shell
+# (Alt+left = go to home directory, Alt+right = go back to previous directory)
+
+# Dracula Theme Configuration
+# ===========================
+theme = "Dracula"

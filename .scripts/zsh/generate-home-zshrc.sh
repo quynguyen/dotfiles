@@ -12,7 +12,6 @@ fi
 # Go two parent dirs up from this script
 pushd "$(dirname ${BASH_SOURCE:-$0})/../../" >/dev/null
 
-export REPLACE_spin='${SPIN}'
 export REPLACE_source=${BASH_SOURCE:-$0}
 export REPLACE_dotfiles_path=$(pwd)
 export REPLACE_home=$HOME
@@ -22,6 +21,8 @@ export REPLACE_p10k_prompt='${(%):-%n}'
 export REPLACE_path='${PATH}'
 export REPLACE_term='${TERM}'
 export REPLACE_tmux='${TMUX}'
+export REPLACE_dotfiles_shell_mode='${DOTFILES_SHELL_MODE}'
+export REPLACE_ostype='${OSTYPE}'
 export REPLACE_warning=$(
 	cat <<-END
 		# !!!!! WARNING !!!!! 
