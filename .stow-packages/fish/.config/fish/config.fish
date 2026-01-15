@@ -14,7 +14,7 @@ set -gx LESS -R
 set -gx LESSOPEN "| (which src-hilite-lesspipe.sh) %s"
 
 # Add custom bin directory to PATH
-set -gx PATH "$HOME/.bin" $PATH
+set -gx PATH "$HOME/.local/bin" "$HOME/.bin" $PATH
 
 # Add Claude CLI path (fix for IDE integration after /migrate-installer)
 set -gx PATH "$HOME/.claude/local/node_modules/.bin" $PATH
@@ -66,10 +66,13 @@ alias dbp "dev cd business-platform"
 alias dshop "dev cd shopify"
 alias dweb "dev cd web"
 alias dbo "dev cd bourgeois"
+alias claude "~/.claude/local/claude"
 
 # Fish-specific config editing aliases
 alias nf "nvim ~/.config/fish/config.fish"
 alias ef "exec fish"
+alias python "python3"
+alias pip "pip3"
 
 # Platform-specific clipboard aliases
 if test (uname) != Darwin
@@ -146,3 +149,20 @@ echo "Fish configuration loaded successfully"
 # bun
 set --export BUN_INSTALL "$HOME/.bun"
 set --export PATH $BUN_INSTALL/bin $PATH
+
+# Added by Antigravity
+fish_add_path /Users/quy/.antigravity/antigravity/bin
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+if test -f /opt/homebrew/Caskroom/miniconda/base/bin/conda
+    eval /opt/homebrew/Caskroom/miniconda/base/bin/conda "shell.fish" "hook" $argv | source
+else
+    if test -f "/opt/homebrew/Caskroom/miniconda/base/etc/fish/conf.d/conda.fish"
+        . "/opt/homebrew/Caskroom/miniconda/base/etc/fish/conf.d/conda.fish"
+    else
+        set -x PATH "/opt/homebrew/Caskroom/miniconda/base/bin" $PATH
+    end
+end
+# <<< conda initialize <<<
+

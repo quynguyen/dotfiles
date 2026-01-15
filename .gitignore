@@ -3,3 +3,4 @@
 .stow-packages/tmux/.tmux/plugins/extrakto
 CLAUDE.md
 .claude/settings.local.json
+.stow-packages/zsh/.zsh/private_exports

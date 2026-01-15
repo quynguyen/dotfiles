@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Cross-shell aliases - sourced by both zsh and fish
+
+# Claude Code alias  
+export CLAUDE_ALIAS='alias claude="~/.claude/local/claude"'
+
+# Export for shell-specific loading
+if [ -n "$ZSH_VERSION" ]; then
+    eval "$CLAUDE_ALIAS"
+elif [ -n "$FISH_VERSION" ]; then
+    # Fish will need to source this differently
+    echo "$CLAUDE_ALIAS" | sed 's/alias //' | sed 's/="/function /' | sed 's/"$/ ; ~/.claude\/local\/claude $argv ; end/'
+fi

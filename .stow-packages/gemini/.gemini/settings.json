@@ -1,6 +1,4 @@
 {
-  "theme": "Dracula",
-  "selectedAuthType": "oauth-personal",
   "mcpServers": {
     "context7": {
       "command": "npx",
@@ -8,6 +6,44 @@
         "-y",
         "@upstash/context7-mcp"
       ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
     }
+  },
+  "general": {
+    "preferredEditor": "vim",
+    "previewFeatures": true,
+    "vimMode": true,
+    "debugKeystrokeLogging": true,
+    "enablePromptCompletion": true
+  },
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    },
+    "folderTrust": {
+      "enabled": true
+    }
+  },
+  "ui": {
+    "theme": "Dracula",
+    "showStatusInTitle": true,
+    "showMemoryUsage": true,
+    "showLineNumbers": true,
+    "showCitations": true,
+    "useFullWidth": true
+  },
+  "output": {
+    "format": "text"
+  },
+  "tools": {
+    "autoAccept": true
+  },
+  "ide": {
+    "enabled": true
   }
 }

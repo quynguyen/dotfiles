@@ -20,3 +20,5 @@ macos-option-as-alt = left
 # Dracula Theme Configuration
 # ===========================
 theme = "Dracula"
+
+keybind = shift+enter=text:\x1b\r

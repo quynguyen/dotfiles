@@ -51,6 +51,7 @@ brew install fzf
 brew install ripgrep
 brew install direnv
 brew install zoxide
+brew install jupyter
 
 # Shell alternatives and themes
 echo "Installing shell alternatives and themes..."

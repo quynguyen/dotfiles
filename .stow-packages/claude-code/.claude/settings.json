@@ -1,23 +1,25 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "cleanupPeriodDays": 365,
   "env": {},
-  "mcpServers": {
-    "context7": {
-      "type": "http",
-      "url": "https://mcp.context7.com/mcp"
-    },
-    "open-memory": {
-      "args": [
-        "-y",
-        "supergateway",
-        "--sse",
-        "http://localhost:8765/mcp/claude/sse/quy"
-      ],
-      "command": "npx"
-    }
-  },
   "permissions": {
     "allow": [],
     "deny": []
+  },
+  "enabledPlugins": {
+    "ralph-loop@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "lua-lsp@claude-plugins-official": true,
+    "kotlin-lsp@claude-plugins-official": true
+  },
+  "alwaysThinkingEnabled": true,
+  "feedbackSurveyState": {
+    "lastShownTime": 1754080918068
   }
 }
