@@ -1,17 +1,15 @@
--- Configure avante.nvim to use Claude (Anthropic) as the AI provider.
--- The ai.avante LazyVim extra installs avante but defaults to Copilot.
--- Requires ANTHROPIC_API_KEY env var to be set.
+-- Configure avante.nvim to use Gemini as the AI provider.
+-- Requires GEMINI_API_KEY env var — get a free key at https://aistudio.google.com/apikey
+-- Uses the new `providers` config format (avante v0.x deprecated top-level provider tables).
 return {
   {
     "yetone/avante.nvim",
     opts = {
-      provider = "claude",
-      claude = {
-        endpoint = "https://api.anthropic.com",
-        model = "claude-sonnet-4-5",
-        timeout = 30000,
-        temperature = 0,
-        max_tokens = 8096,
+      provider = "gemini",
+      providers = {
+        gemini = {
+          model = "gemini-2.5-pro-exp-03-25",
+        },
       },
     },
   },
