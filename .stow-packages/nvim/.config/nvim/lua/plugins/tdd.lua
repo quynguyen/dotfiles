@@ -288,11 +288,11 @@ return {
   {
     "folke/snacks.nvim",
     keys = {
-      { "<leader>tw", setup_tdd_layout, desc = "TDD: Set up workspace layout" },
-      { "<leader>ta", jump_to_alternate, desc = "TDD: Jump to alternate file" },
+      { "<leader>tW", setup_tdd_layout, desc = "TDD: Set up workspace layout" },
+      { "<leader>tA", jump_to_alternate, desc = "TDD: Jump to alternate file" },
       { "<leader>tc", toggle_tcr,        desc = "TDD: Toggle TCR mode" },
       {
-        "<C-j>",
+        "<leader>tj",
         function()
           if watcher_terminal and watcher_terminal.win and vim.api.nvim_win_is_valid(watcher_terminal.win) then
             vim.api.nvim_set_current_win(watcher_terminal.win)
