@@ -67,6 +67,13 @@ local function get_alternate(path)
     return dir .. "/" .. vim.fn.fnamemodify(name, ":r") .. ".test.ts"
   end
 
+  -- TypeScript React: foo.test.tsx  <->  foo.tsx
+  local tsx = name:match("^(.+)%.test%.tsx$")
+  if tsx then return dir .. "/" .. tsx .. ".tsx" end
+  if name:match("%.tsx$") and not name:match("%.test%.tsx$") then
+    return dir .. "/" .. vim.fn.fnamemodify(name, ":r") .. ".test.tsx"
+  end
+
   -- JavaScript: foo.test.js  <->  foo.js
   local js = name:match("^(.+)%.test%.js$")
   if js then return dir .. "/" .. js .. ".js" end
@@ -204,16 +211,21 @@ local function toggle_tcr()
       vim.notify("TCR: could not detect language root", vim.log.levels.WARN)
       return
     end
-    -- Replace watcher with TCR terminal
+    -- Check TCR script exists
+    if vim.fn.filereadable(TCR_SCRIPT) ~= 1 then
+      vim.notify("TCR: script not found: " .. TCR_SCRIPT, vim.log.levels.ERROR)
+      return
+    end
+    -- Replace watcher with a display terminal (bash shell, passive)
     if watcher_terminal then
       watcher_terminal:close()
       watcher_terminal = nil
     end
-    watcher_terminal = require("snacks").terminal.open(TCR_SCRIPT, {
+    watcher_terminal = require("snacks").terminal.open("bash", {
       cwd = lang_root,
       win = { position = "bottom", height = 0.2 },
     })
-    -- Run tcr.sh on every save via jobstart (non-blocking, separate from the display terminal)
+    -- Run tcr.sh on every save via jobstart (non-blocking)
     vim.api.nvim_create_autocmd("BufWritePost", {
       group = vim.api.nvim_create_augroup("tcr_on_save", { clear = true }),
       pattern = "*",
@@ -222,7 +234,30 @@ local function toggle_tcr()
         local cdir = vim.fn.fnamemodify(cur ~= "" and cur or vim.fn.getcwd(), ":h")
         local root, _ = find_language_root(cdir)
         if root then
-          vim.fn.jobstart({ TCR_SCRIPT }, { cwd = root })
+          local output = {}
+          vim.fn.jobstart({ TCR_SCRIPT }, {
+            cwd = root,
+            stdout_buffered = true,
+            stderr_buffered = true,
+            on_stdout = function(_, data)
+              for _, line in ipairs(data) do
+                if line ~= "" then table.insert(output, line) end
+              end
+            end,
+            on_stderr = function(_, data)
+              for _, line in ipairs(data) do
+                if line ~= "" then table.insert(output, line) end
+              end
+            end,
+            on_exit = function(_, code)
+              local msg = table.concat(output, "\n")
+              if msg ~= "" then
+                vim.schedule(function()
+                  vim.notify(msg, code == 0 and vim.log.levels.INFO or vim.log.levels.WARN)
+                end)
+              end
+            end,
+          })
         end
       end,
     })
