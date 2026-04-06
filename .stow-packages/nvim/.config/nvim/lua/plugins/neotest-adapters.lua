@@ -1,6 +1,6 @@
 -- neotest adapters for Python, TypeScript/JS, Elixir, Ruby, Java.
 -- BufWritePost autocmd runs nearest test on save (allowlisted filetypes only).
--- Java: manual only (Gradle cold-start too slow; requires jdtls attached — check :LspInfo).
+-- Java: manual only (Gradle cold-start too slow; requires jdtls attached — check :lsp).
 -- Kotlin: no adapter available — watcher only.
 return {
   {
