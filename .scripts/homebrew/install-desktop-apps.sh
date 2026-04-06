@@ -56,6 +56,10 @@ brew install --cask docker
 echo "Installing Visual Studio Code..."
 brew install --cask visual-studio-code
 
+# Espanso - Universal text expander / keyboard macros (cross-platform)
+echo "Installing Espanso..."
+brew install --cask espanso
+
 # Claudia - Community GUI toolkit for Claude Code (build from source)
 echo "Installing Claudia (Claude GUI toolkit)..."
 CLAUDIA_DIR="$HOME/Development/claudia"
@@ -148,7 +152,8 @@ echo "  - Claude Desktop (official Anthropic AI app)"
 echo "  - ChatGPT Desktop (official OpenAI app)"
 echo "  - Docker Desktop (container management and development)"
 echo "  - Visual Studio Code (code editor)"
-echo "  - Claudia (community GUI toolkit for Claude Code)"
+echo "  - Claudia (community GUI toolkit for Claude Code)
+  - Espanso (universal text expander / keyboard macros)"
 echo ""
 echo "You may need to:"
 echo "  1. Launch Google Drive and sign in"

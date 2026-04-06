@@ -1,0 +1,40 @@
+matches:
+  # Double quotes: ;" → "▌"
+  - trigger: ";\""
+    replace: "\"$|$\""
+    word: false
+
+  # Single quotes: ;' → '▌'
+  - trigger: ";'"
+    replace: "'$|$'"
+    word: false
+
+  # Parentheses: ;( → (▌)
+  - trigger: ";("
+    replace: "($|$)"
+    word: false
+
+  # Braces: ;{ → {▌}
+  - trigger: ";{"
+    replace: "{$|$}"
+    word: false
+
+  # Brackets: ;[ → [▌]
+  - trigger: ";["
+    replace: "[$|$]"
+    word: false
+
+  # Angle brackets: ;< → <▌>
+  - trigger: ";<"
+    replace: "<$|$>"
+    word: false
+
+  # HTML/XML closing tag: ;/ → </▌>
+  - trigger: ";/"
+    replace: "</$|$>"
+    word: false
+
+  # HTML/XML self-closing tag: ;\ → <▌/>
+  - trigger: ";\\"
+    replace: "<$|$/>"
+    word: false

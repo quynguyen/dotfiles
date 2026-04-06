@@ -19,7 +19,12 @@
     "previewFeatures": true,
     "vimMode": true,
     "debugKeystrokeLogging": true,
-    "enablePromptCompletion": true
+    "enablePromptCompletion": true,
+    "sessionRetention": {
+      "enabled": true,
+      "maxAge": "30d",
+      "warningAcknowledged": true
+    }
   },
   "security": {
     "auth": {

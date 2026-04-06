@@ -11,7 +11,7 @@ local tcr_active = false
 
 local LANG_MARKERS = {
   { file = "mix.exs",          cmd = "mix test.watch" },
-  { file = "pyproject.toml",   cmd = "uv run ptw" },
+  { file = "pyproject.toml",   cmd = "uv run ptw ." },
   { file = "package.json",     cmd = "pnpm vitest watch" },
   { file = "Gemfile",          cmd = "bundle exec guard" },
   { file = "build.gradle.kts", cmd = "./gradlew test --continuous" },
@@ -199,7 +199,14 @@ end
 -- ON:  close watcher terminal, open TCR terminal, add BufWritePost → tcr.sh
 -- OFF: clear BufWritePost, close TCR terminal, reopen watcher terminal
 
-local TCR_SCRIPT = vim.fn.expand("~/projects/hacking/scripts/tcr.sh")
+-- Resolve tcr.sh from the git worktree root so it works in any worktree.
+local function get_tcr_script()
+  local root = vim.trim(vim.fn.system("git rev-parse --show-toplevel 2>/dev/null"))
+  if vim.v.shell_error ~= 0 or root == "" then
+    return vim.fn.expand("~/projects/hacking/main/scripts/tcr.sh")
+  end
+  return root .. "/scripts/tcr.sh"
+end
 
 local function toggle_tcr()
   local path = vim.api.nvim_buf_get_name(0)
@@ -212,6 +219,7 @@ local function toggle_tcr()
       return
     end
     -- Check TCR script exists
+    local TCR_SCRIPT = get_tcr_script()
     if vim.fn.filereadable(TCR_SCRIPT) ~= 1 then
       vim.notify("TCR: script not found: " .. TCR_SCRIPT, vim.log.levels.ERROR)
       return
@@ -235,7 +243,7 @@ local function toggle_tcr()
         local root, _ = find_language_root(cdir)
         if root then
           local output = {}
-          vim.fn.jobstart({ TCR_SCRIPT }, {
+          vim.fn.jobstart({ get_tcr_script() }, {
             cwd = root,
             stdout_buffered = true,
             stderr_buffered = true,

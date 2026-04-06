@@ -28,9 +28,13 @@ alias dbp="dev cd business-platform"
 alias dshop="dev cd shopify"
 alias dweb="dev cd web"
 alias dbo="dev cd bourgeois"
-alias claude="~/.claude/local/claude"
+alias claude="~/.local/bin/claude"
 alias python="python3"
 alias pip="pip3"
+alias wl="wt list"
+alias wm="wt merge"
+alias ws="wt switch"
+alias wr="wt remove"
 
 if [[ `uname` != "Darwin" ]]; then
 	if [[ `which xsel 2> /dev/null` ]]; then

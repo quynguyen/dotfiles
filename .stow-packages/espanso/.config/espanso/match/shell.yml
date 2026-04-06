@@ -1,0 +1,26 @@
+matches:
+  # Command substitution: ;sub → $(▌)
+  - trigger: ";sub"
+    replace: "$($|$)"
+    word: false
+
+  # Variable with braces: ;var → ${▌}
+  - trigger: ";var"
+    replace: "${$|$}"
+    word: false
+
+  # Heredoc: ;heredoc → <<EOF\n▌\nEOF
+  - trigger: ";heredoc"
+    replace: "<<EOF\n$|$\nEOF"
+    word: false
+    force_clipboard: true
+
+  # Bash shebang: ;bash
+  - trigger: ";bash"
+    replace: "#!/usr/bin/env bash"
+    word: false
+
+  # Node shebang: ;node
+  - trigger: ";node"
+    replace: "#!/usr/bin/env node"
+    word: false

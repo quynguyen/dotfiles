@@ -1,0 +1,5 @@
+matches:
+  # Gmail: ;gmail → quy.nguyen@gmail.com
+  - trigger: ";gmail"
+    replace: "quy.nguyen@gmail.com"
+    word: false

@@ -1,0 +1,15 @@
+matches:
+  # TODO comment: ;todo → # TODO(quy): ▌
+  - trigger: ";todo"
+    replace: "# TODO(quy): $|$"
+    word: false
+
+  # JS template literal: ;tlit → `${▌}`
+  - trigger: ";tlit"
+    replace: "`${$|$}`"
+    word: false
+
+  # Arrow function: ;arrow → (▌) => {}
+  - trigger: ";arrow"
+    replace: "($|$) => {}"
+    word: false

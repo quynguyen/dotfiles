@@ -1,0 +1,30 @@
+matches:
+  # Current date: ;date → 2026-03-26
+  - trigger: ";date"
+    replace: "{{today}}"
+    word: false
+    vars:
+      - name: today
+        type: date
+        params:
+          format: "%Y-%m-%d"
+
+  # Local timestamp: ;TS → 2026-03-26T12:32:00-04:00
+  - trigger: ";ts"
+    replace: "{{local}}"
+    word: false
+    vars:
+      - name: local
+        type: shell
+        params:
+          cmd: "date '+%Y-%m-%dT%H:%M:%S%z' | sed 's/\\(.\\{2\\}\\)$/:\\1/'"
+
+  # UTC timestamp: ;TZ → 2026-03-26T16:32:00Z
+  - trigger: ";tz"
+    replace: "{{utc}}"
+    word: false
+    vars:
+      - name: utc
+        type: shell
+        params:
+          cmd: "date -u '+%Y-%m-%dT%H:%M:%SZ'"

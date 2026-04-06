@@ -1,0 +1,35 @@
+matches:
+  # Describe a pasted image
+  - trigger: ";see"
+    replace: "The attached image shows $|$"
+    word: false
+   
+  # Numbered attachment: ;1 → "Attachment 1 - ", ;2 → "Attachment 2 - ", etc.
+  - regex: ";(?P<num>\\d{1,2})"
+    replace: "Attachment {{num}} - "
+
+  # Report a UI bug from screenshot
+  - trigger: ";uibug"
+    replace: "See attached image. The issue is $|$\n\nExpected:\n\nActual:"
+    word: false
+    force_clipboard: true
+
+  # Ask for a fix based on screenshot
+  - trigger: ";fix"
+    replace: "See attachment. Please fix $|$"
+    word: false
+
+  # Compare two pasted images
+  - trigger: ";compare"
+    replace: "Image 1 (above) shows the current state. Image 2 shows $|$"
+    word: false
+
+  # Annotate what to look at in a screenshot
+  - trigger: ";look"
+    replace: "In the screenshot above, look at $|$"
+    word: false
+
+  # Paste-then-describe (prompt before pasting)
+  - trigger: ";show"
+    replace: "Here's a screenshot of $|$:"
+    word: false

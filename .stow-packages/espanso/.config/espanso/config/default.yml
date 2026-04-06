@@ -1,0 +1,9 @@
+# Espanso global configuration
+#
+# backend: inject uses direct key injection rather than clipboard,
+# avoiding clipboard flicker. Works reliably on macOS and X11 Linux.
+# On Wayland, change to: backend: clipboard
+backend: inject
+
+# Backspace after an expansion reverts to the original typed trigger
+undo_backspace: true

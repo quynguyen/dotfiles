@@ -1,0 +1,33 @@
+matches:
+  # Paste-link: ;plink → [▌](clipboard)
+  - trigger: ";plink"
+    replace: "[$|$]({{clip}})"
+    vars:
+      - name: clip
+        type: clipboard
+    word: false
+
+  # Paste-image: ;pimg → ![▌](clipboard)
+  - trigger: ";pimg"
+    replace: "![$|$]({{clip}})"
+    vars:
+      - name: clip
+        type: clipboard
+    word: false
+
+  # Paste-code-block: ;pcb → ```\nclipboard\n```
+  - trigger: ";pcb"
+    replace: "```\n{{clip}}\n```"
+    vars:
+      - name: clip
+        type: clipboard
+    word: false
+    force_clipboard: true
+
+  # Paste-inline-code: ;p` → `clipboard`
+  - trigger: ";p`"
+    replace: "`{{clip}}`"
+    vars:
+      - name: clip
+        type: clipboard
+    word: false

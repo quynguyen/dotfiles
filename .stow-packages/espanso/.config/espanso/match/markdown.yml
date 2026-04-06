@@ -1,0 +1,53 @@
+matches:
+  # Inline code: ;` → `▌`
+  - trigger: ";`"
+    replace: "`$|$`"
+    word: false
+
+  # Code block: ;cb → ```\n▌\n```
+  - trigger: ";cb"
+    replace: "```\n$|$\n```"
+    word: false
+    force_clipboard: true
+
+  # Code block with language: ;lang → ```▌\n\n```  (type language, then Enter)
+  - trigger: ";lang"
+    replace: "```$|$\n\n```"
+    word: false
+    force_clipboard: true
+
+  # Named code block: ;javascript-cb → ```javascript\n\n```  etc.
+  - regex: ";(?P<lang>[a-zA-Z0-9]+)-cb"
+    replace: "```{{lang}}\n$|$\n```"
+    force_clipboard: true
+
+  # Bold: ;bold → **▌**
+  - trigger: ";bold"
+    replace: "**$|$**"
+    word: false
+
+  # Link: ;link → [▌](url)
+  - trigger: ";link"
+    replace: "[$|$](url)"
+    word: false
+
+  # Strikethrough: ;strike → ~~▌~~
+  - trigger: ";strike"
+    replace: "~~$|$~~"
+    word: false
+
+  # Table skeleton: ;table → 3-row table, cursor in first data cell
+  - trigger: ";table"
+    replace: "| col1 | col2 |\n|---|---|\n| $|$ | |"
+    word: false
+    force_clipboard: true
+
+  # Image: ;img → ![▌](url)
+  - trigger: ";img"
+    replace: "![$|$](url)"
+    word: false
+
+  # Checkbox: ;check → - [ ] ▌
+  - trigger: ";check"
+    replace: "- [ ] $|$"
+    word: false
