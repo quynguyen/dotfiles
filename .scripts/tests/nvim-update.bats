@@ -62,3 +62,18 @@ teardown() {
   [[ "$status" -eq 1 ]]
   [[ "$output" == *"E5113"* ]]
 }
+
+@test "generate_report produces valid JSON with clean status" {
+  local updated_json='[{"plugin":"plugin-a","old_sha":"aaa","new_sha":"bbb","commits":["fix: thing"],"breaking_signals":false}]'
+
+  result=$(generate_report "2026-04-07" "$updated_json" "[]" "" "clean")
+  echo "$result" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['status']=='clean'; assert len(d['updated'])==1; assert d['updated'][0]['plugin']=='plugin-a'"
+}
+
+@test "generate_report includes rolled_back plugins and sets needs_attention" {
+  local updated_json='[]'
+  local rolled_back_json='[{"plugin":"plugin-b","old_sha":"bbb","new_sha":"ccc","error":"E5113: Error","commits":["feat!: break things"]}]'
+
+  result=$(generate_report "2026-04-07" "$updated_json" "$rolled_back_json" "some diff" "needs_attention")
+  echo "$result" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['status']=='needs_attention'; assert len(d['rolled_back'])==1; assert d['checkhealth_diff']=='some diff'"
+}

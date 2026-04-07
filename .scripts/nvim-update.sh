@@ -80,6 +80,28 @@ check_startup() {
   return 0
 }
 
+# generate_report(date, updated_json, rolled_back_json, checkhealth_diff, status)
+# Outputs a JSON report to stdout.
+generate_report() {
+  local date="$1"
+  local updated_json="$2"
+  local rolled_back_json="$3"
+  local checkhealth_diff="$4"
+  local status="$5"
+
+  python3 -c "
+import json, sys
+report = {
+    'date': sys.argv[1],
+    'updated': json.loads(sys.argv[2]),
+    'rolled_back': json.loads(sys.argv[3]),
+    'checkhealth_diff': sys.argv[4],
+    'status': sys.argv[5]
+}
+print(json.dumps(report, indent=2))
+" "$date" "$updated_json" "$rolled_back_json" "$checkhealth_diff" "$status"
+}
+
 # Allow sourcing without executing main
 if [[ "${1:-}" == "--source-only" ]]; then
   return 0 2>/dev/null || true
