@@ -1,0 +1,2 @@
+# Initialize zsh completion system before plugins
+autoload -Uz compinit && compinit
