@@ -77,3 +77,25 @@ teardown() {
   result=$(generate_report "2026-04-07" "$updated_json" "$rolled_back_json" "some diff" "needs_attention")
   echo "$result" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['status']=='needs_attention'; assert len(d['rolled_back'])==1; assert d['checkhealth_diff']=='some diff'"
 }
+
+@test "check_health creates baseline on first run and returns empty diff" {
+  nvim() { echo "OK checkhealth output"; }
+  export -f nvim
+  local baseline="$TMPDIR/checkhealth-baseline.txt"
+
+  result=$(check_health "$baseline")
+  [[ -z "$result" ]]
+  [[ -f "$baseline" ]]
+  [[ "$(cat "$baseline")" == "OK checkhealth output" ]]
+}
+
+@test "check_health diffs against existing baseline" {
+  nvim() { echo "ERROR nvim-lspconfig: broken"; }
+  export -f nvim
+  local baseline="$TMPDIR/checkhealth-baseline.txt"
+  echo "OK nvim-lspconfig: working" > "$baseline"
+
+  result=$(check_health "$baseline")
+  [[ -n "$result" ]]
+  [[ "$result" == *"nvim-lspconfig"* ]]
+}

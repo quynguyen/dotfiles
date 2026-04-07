@@ -102,6 +102,28 @@ print(json.dumps(report, indent=2))
 " "$date" "$updated_json" "$rolled_back_json" "$checkhealth_diff" "$status"
 }
 
+# check_health(baseline_path)
+# Runs checkhealth headlessly and diffs against the baseline.
+# On first run (no baseline), saves current output as baseline, returns empty.
+# On subsequent runs, returns the diff.
+check_health() {
+  local baseline_path="$1"
+  local current
+  current=$(nvim --headless +"checkhealth" +qa 2>&1 || true)
+
+  if [[ ! -f "$baseline_path" ]]; then
+    echo "$current" > "$baseline_path"
+    return 0
+  fi
+
+  local health_diff
+  health_diff=$(diff <(cat "$baseline_path") <(echo "$current") 2>/dev/null || true)
+
+  if [[ -n "$health_diff" ]]; then
+    echo "$health_diff"
+  fi
+}
+
 # Allow sourcing without executing main
 if [[ "${1:-}" == "--source-only" ]]; then
   return 0 2>/dev/null || true
