@@ -1,0 +1,4 @@
+# mise — polyglot version manager (Ruby, Node, etc.)
+if command -v mise &> /dev/null; then
+  eval "$(mise activate zsh)"
+fi
