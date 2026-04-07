@@ -110,7 +110,150 @@ check_health() {
   fi
 }
 
+# snapshot_lockfile()
+# Copies lockfile to a temp location and prints the temp path.
+snapshot_lockfile() {
+  local snapshot
+  snapshot=$(mktemp)
+  cp "$LOCKFILE" "$snapshot"
+  echo "$snapshot"
+}
+
+# notify(message)
+# Sends macOS notification and creates attention flag.
+notify() {
+  local message="$1"
+  touch "$ATTENTION_FLAG"
+  osascript -e "display notification \"$message\" with title \"Neovim\"" 2>/dev/null || true
+}
+
+main() {
+  local today
+  today=$(date +%Y-%m-%d)
+
+  # Ensure report directory exists
+  mkdir -p "$REPORT_DIR"
+
+  # Step 1: Snapshot
+  local snapshot
+  snapshot=$(snapshot_lockfile)
+
+  # Step 2: Update
+  nvim --headless +"Lazy! update" +qa 2>/dev/null
+
+  # Step 3: Diff
+  local changes
+  changes=$(diff_lockfile "$snapshot" "$LOCKFILE")
+  if [[ -z "$changes" ]]; then
+    rm -f "$snapshot"
+    exit 0
+  fi
+
+  # Step 4: Scan commits for breaking signals
+  local updated_json="[]"
+  local has_breaking_signals=false
+  local plugin old_sha new_sha commits scan_exit
+
+  while IFS='|' read -r plugin old_sha new_sha; do
+    commits=$(scan_commits "$plugin" "$old_sha" "$new_sha") && scan_exit=0 || scan_exit=$?
+    local breaking_signals=false
+    if [[ $scan_exit -ne 0 ]]; then
+      breaking_signals=true
+      has_breaking_signals=true
+    fi
+
+    # Build JSON array entry
+    local commits_json
+    commits_json=$(echo "$commits" | python3 -c "import json,sys; print(json.dumps([l.strip() for l in sys.stdin if l.strip()]))")
+    updated_json=$(echo "$updated_json" | python3 -c "
+import json, sys
+arr = json.loads(sys.stdin.read())
+arr.append({'plugin': '$plugin', 'old_sha': '$old_sha', 'new_sha': '$new_sha', 'commits': $commits_json, 'breaking_signals': $breaking_signals})
+print(json.dumps(arr))
+")
+  done <<< "$changes"
+
+  # Step 5: Startup check
+  local startup_error=""
+  local rolled_back_json="[]"
+  if ! startup_error=$(check_startup); then
+    # Step 7: Rollback — restore entire lockfile
+    cp "$snapshot" "$LOCKFILE"
+    nvim --headless +"Lazy! restore" +qa 2>/dev/null || true
+
+    # Move all updated plugins to rolled_back
+    rolled_back_json=$(echo "$updated_json" | python3 -c "
+import json, sys
+updated = json.loads(sys.stdin.read())
+rolled_back = [dict(p, error='$(echo "$startup_error" | head -5 | tr "'" " ")') for p in updated]
+for p in rolled_back:
+    del p['breaking_signals']
+print(json.dumps(rolled_back))
+")
+    updated_json="[]"
+
+    # Verify recovery
+    local status="needs_attention"
+    if ! check_startup >/dev/null 2>&1; then
+      status="startup_failure"
+    fi
+
+    # Step 6: Checkhealth (on rolled-back state)
+    local health_diff
+    health_diff=$(check_health "$BASELINE_FILE")
+
+    # Skip commit — lockfile is back to original
+    # Step 9: Write report
+    generate_report "$today" "$updated_json" "$rolled_back_json" "$health_diff" "$status" \
+      > "$REPORT_DIR/$today.json"
+
+    # Step 10: Notify
+    notify "Plugin update rolled back — needs attention"
+    rm -f "$snapshot"
+    exit 0
+  fi
+
+  # Step 6: Checkhealth (on updated state)
+  local health_diff
+  health_diff=$(check_health "$BASELINE_FILE")
+
+  # Determine status
+  local status="clean"
+  if [[ "$has_breaking_signals" == "true" ]]; then
+    status="needs_attention"
+  fi
+
+  # Step 8: Commit lockfile
+  local commit_msg="chore(nvim): daily plugin update $today"
+  if [[ "$status" == "needs_attention" ]]; then
+    commit_msg="chore(nvim): daily plugin update $today (breaking signals detected)"
+  fi
+  (
+    cd "$HOME/dotfiles"
+    git add .stow-packages/nvim/.config/nvim/lazy-lock.json
+    git commit -m "$commit_msg" 2>/dev/null || true
+  )
+
+  # Step 9: Write report
+  generate_report "$today" "$updated_json" "$rolled_back_json" "$health_diff" "$status" \
+    > "$REPORT_DIR/$today.json"
+
+  # Step 10: Notify (only if not clean)
+  if [[ "$status" != "clean" ]]; then
+    notify "Plugin update has breaking signals — review recommended"
+  fi
+
+  # Update baseline on clean run
+  if [[ "$status" == "clean" ]]; then
+    nvim --headless +"checkhealth" +qa 2>&1 > "$BASELINE_FILE" || true
+  fi
+
+  rm -f "$snapshot"
+}
+
 # Allow sourcing without executing main
 if [[ "${1:-}" == "--source-only" ]]; then
   return 0 2>/dev/null || true
 fi
+
+main "$@"
