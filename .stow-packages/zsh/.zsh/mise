@@ -1,6 +1,7 @@
 # mise — polyglot version manager (Ruby, Node, etc.)
-# Uses shims so mise-managed tools take priority regardless of PATH order
-# (Homebrew's brew shellenv prepends paths after this file loads)
-if command -v mise &> /dev/null; then
-  eval "$(mise activate zsh --shims)"
+# Shims dir is added directly to PATH (front) so mise-managed tools
+# take priority over Homebrew. This runs before brew shellenv loads,
+# so we can't rely on `command -v mise` here.
+if [[ -d "$HOME/.local/share/mise/shims" ]]; then
+  export PATH="$HOME/.local/share/mise/shims:$PATH"
 fi
