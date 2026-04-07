@@ -1,0 +1,4 @@
+# Neovim daily plugin update notification
+if [[ -f ~/.nvim-update-attention ]]; then
+  echo "⚠ Neovim plugin update needs attention — run /nvim-update-fix in Claude Code"
+fi
