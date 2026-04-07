@@ -26,3 +26,22 @@ teardown() {
   result=$(diff_lockfile "$FIXTURES_DIR/lockfile-before.json" "$FIXTURES_DIR/lockfile-no-change.json")
   [[ -z "$result" ]]
 }
+
+@test "scan_commits detects breaking-change signals and exits 1" {
+  # Mock git to return fixture data
+  git() { cat "$FIXTURES_DIR/git-log-breaking.txt"; }
+  export -f git
+
+  run scan_commits "plugin-a" "oldsha" "newsha"
+  [[ "$status" -eq 1 ]]
+  [[ "$output" == *"feat!: rename setup()"* ]]
+  [[ "$output" == *"BREAKING: remove deprecated"* ]]
+}
+
+@test "scan_commits exits 0 when no breaking signals" {
+  git() { echo "abc1234 fix: handle nil check in diagnostics"; echo "def5678 chore: bump dependency"; }
+  export -f git
+
+  run scan_commits "plugin-a" "oldsha" "newsha"
+  [[ "$status" -eq 0 ]]
+}

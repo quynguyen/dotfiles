@@ -44,6 +44,27 @@ for k, v in sorted(d.items()):
   done
 }
 
+# scan_commits(plugin, old_sha, new_sha)
+# Outputs commit log for the plugin between old and new SHA.
+# Exits 1 if any commits contain breaking-change signals.
+scan_commits() {
+  local plugin="$1"
+  local old_sha="$2"
+  local new_sha="$3"
+  local plugin_path="$PLUGIN_DIR/$plugin"
+
+  local commits
+  commits=$(git -C "$plugin_path" log "${old_sha}..${new_sha}" --oneline 2>/dev/null || echo "")
+
+  echo "$commits"
+
+  # Check for breaking-change signals
+  if echo "$commits" | grep -qiE '(breaking|deprecated|removed|!:)'; then
+    return 1
+  fi
+  return 0
+}
+
 # Allow sourcing without executing main
 if [[ "${1:-}" == "--source-only" ]]; then
   return 0 2>/dev/null || true
