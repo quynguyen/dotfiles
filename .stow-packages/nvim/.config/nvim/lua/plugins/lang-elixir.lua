@@ -3,6 +3,10 @@
 -- which would double-attach alongside Lexical on .ex/.exs files.
 return {
   {
+    "nvim-treesitter/nvim-treesitter",
+    opts = { ensure_installed = { "elixir", "heex", "eex" } },
+  },
+  {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
