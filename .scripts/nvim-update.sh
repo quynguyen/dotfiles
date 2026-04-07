@@ -163,14 +163,19 @@ main() {
     fi
 
     # Build JSON array entry
-    local commits_json
-    commits_json=$(echo "$commits" | python3 -c "import json,sys; print(json.dumps([l.strip() for l in sys.stdin if l.strip()]))")
     updated_json=$(echo "$updated_json" | python3 -c "
 import json, sys
 arr = json.loads(sys.stdin.read())
-arr.append({'plugin': '$plugin', 'old_sha': '$old_sha', 'new_sha': '$new_sha', 'commits': $commits_json, 'breaking_signals': $breaking_signals})
+commits = [l.strip() for l in sys.argv[4].splitlines() if l.strip()]
+arr.append({
+    'plugin': sys.argv[1],
+    'old_sha': sys.argv[2],
+    'new_sha': sys.argv[3],
+    'commits': commits,
+    'breaking_signals': sys.argv[5] == 'true'
+})
 print(json.dumps(arr))
-")
+" "$plugin" "$old_sha" "$new_sha" "$commits" "$breaking_signals")
   done <<< "$changes"
 
   # Step 5: Startup check
