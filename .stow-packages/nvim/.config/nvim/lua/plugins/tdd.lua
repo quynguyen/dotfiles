@@ -103,14 +103,30 @@ local function get_alternate(path)
     return dir .. "/" .. vim.fn.fnamemodify(name, ":r") .. "_spec.rb"
   end
 
-  -- Kotlin: FooTest.kt  <->  Foo.kt
+  -- Kotlin: src/test/kotlin/FooTest.kt  <->  src/main/kotlin/Foo.kt (Gradle layout)
+  --         FooTest.kt  <->  Foo.kt  (flat layout fallback)
+  local kt_test_base, kt_test_stem = path:match("^(.*)/src/test/kotlin/(.+)Test%.kt$")
+  if kt_test_base then return kt_test_base .. "/src/main/kotlin/" .. kt_test_stem .. ".kt" end
+  local kt_main_base, kt_main_stem = path:match("^(.*)/src/main/kotlin/(.+)%.kt$")
+  if kt_main_base and not kt_main_stem:match("Test$") then
+    return kt_main_base .. "/src/test/kotlin/" .. kt_main_stem .. "Test.kt"
+  end
+  -- flat layout fallback
   local kt = name:match("^(.+)Test%.kt$")
   if kt then return dir .. "/" .. kt .. ".kt" end
   if name:match("%.kt$") and not name:match("Test%.kt$") then
     return dir .. "/" .. vim.fn.fnamemodify(name, ":r") .. "Test.kt"
   end
 
-  -- Java: FooTest.java  <->  Foo.java
+  -- Java: src/test/java/FooTest.java  <->  src/main/java/Foo.java (Gradle/Maven layout)
+  --       FooTest.java  <->  Foo.java  (flat layout fallback)
+  local jv_test_base, jv_test_stem = path:match("^(.*)/src/test/java/(.+)Test%.java$")
+  if jv_test_base then return jv_test_base .. "/src/main/java/" .. jv_test_stem .. ".java" end
+  local jv_main_base, jv_main_stem = path:match("^(.*)/src/main/java/(.+)%.java$")
+  if jv_main_base and not jv_main_stem:match("Test$") then
+    return jv_main_base .. "/src/test/java/" .. jv_main_stem .. "Test.java"
+  end
+  -- flat layout fallback
   local jv = name:match("^(.+)Test%.java$")
   if jv then return dir .. "/" .. jv .. ".java" end
   if name:match("%.java$") and not name:match("Test%.java$") then
