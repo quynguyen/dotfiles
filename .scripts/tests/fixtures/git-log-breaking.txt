@@ -1,0 +1,5 @@
+abc1234 feat!: rename setup() to configure()
+def5678 fix: handle nil check in diagnostics
+ghi9012 chore(deps): bump JohnnyMorganz/stylua-action from 4 to 5
+jkl3456 BREAKING: remove deprecated lsp.setup() method
+mno7890 fix: deprecated option warning on startup

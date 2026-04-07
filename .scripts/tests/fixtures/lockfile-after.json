@@ -1,0 +1,5 @@
+{
+  "plugin-a": { "branch": "main", "commit": "aaaa4444aaaa4444aaaa4444aaaa4444aaaa4444" },
+  "plugin-b": { "branch": "main", "commit": "bbbb5555bbbb5555bbbb5555bbbb5555bbbb5555" },
+  "plugin-c": { "branch": "main", "commit": "cccc3333cccc3333cccc3333cccc3333cccc3333" }
+}
