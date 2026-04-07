@@ -10,9 +10,9 @@ local tcr_active = false
 -- Returns (lang_root_path, watcher_cmd) or (nil, nil).
 
 local LANG_MARKERS = {
-  { file = "mix.exs",          cmd = "mix test.watch" },
-  { file = "pyproject.toml",   cmd = "uv run ptw ." },
-  { file = "package.json",     cmd = "pnpm vitest watch" },
+  { file = "mix.exs",          cmd = "mix test.watch",              file_cmd = "mix test.watch %s" },
+  { file = "pyproject.toml",   cmd = "uv run ptw .",                file_cmd = "PYTEST_ADDOPTS='%s' uv run ptw ." },
+  { file = "package.json",     cmd = "pnpm vitest watch",           file_cmd = "pnpm vitest watch %s" },
   { file = "Gemfile",          cmd = "bundle exec guard" },
   { file = "build.gradle.kts", cmd = "./gradlew test --continuous" },
   { file = "build.gradle",     cmd = "./gradlew test --continuous" },
@@ -23,13 +23,13 @@ local function find_language_root(start_dir)
     "git -C " .. vim.fn.shellescape(start_dir) .. " rev-parse --show-toplevel"
   ))
   if vim.v.shell_error ~= 0 or git_root == "" then
-    return nil, nil
+    return nil, nil, nil
   end
   local dir = start_dir
   while true do
     for _, marker in ipairs(LANG_MARKERS) do
       if vim.fn.filereadable(dir .. "/" .. marker.file) == 1 then
-        return dir, marker.cmd
+        return dir, marker.cmd, marker.file_cmd
       end
     end
     if dir == git_root or dir == "/" then
@@ -37,7 +37,16 @@ local function find_language_root(start_dir)
     end
     dir = vim.fn.fnamemodify(dir, ":h")
   end
-  return nil, nil
+  return nil, nil, nil
+end
+
+-- Build watcher command scoped to a test file when possible.
+local function build_watcher_cmd(watcher_cmd, file_cmd, lang_root, test_path)
+  if file_cmd and test_path and test_path:sub(1, #lang_root) == lang_root then
+    local rel = test_path:sub(#lang_root + 2)
+    return file_cmd:format(rel)
+  end
+  return watcher_cmd
 end
 
 -- ─── Alternate File Pairing ───────────────────────────────────────────────────
@@ -165,12 +174,14 @@ local function setup_tdd_layout()
     vim.cmd("vsplit")
   end
 
-  -- Start watcher in bottom split
+  -- Start watcher in bottom split, scoped to the current test file
   local bufdir = vim.fn.fnamemodify(path, ":h")
-  local lang_root, watcher_cmd = find_language_root(bufdir)
+  local lang_root, watcher_cmd, file_cmd = find_language_root(bufdir)
   if lang_root and watcher_cmd then
-    watcher_terminal = require("snacks").terminal.open(watcher_cmd, {
+    local cmd = build_watcher_cmd(watcher_cmd, file_cmd, lang_root, test_path)
+    watcher_terminal = require("snacks").terminal.open(cmd, {
       cwd = lang_root,
+      auto_close = false,
       win = { position = "bottom", height = 0.2 },
     })
   else
@@ -211,7 +222,7 @@ end
 local function toggle_tcr()
   local path = vim.api.nvim_buf_get_name(0)
   local bufdir = vim.fn.fnamemodify(path ~= "" and path or vim.fn.getcwd(), ":h")
-  local lang_root, watcher_cmd = find_language_root(bufdir)
+  local lang_root, watcher_cmd, file_cmd = find_language_root(bufdir)
 
   if not tcr_active then
     if not lang_root then
@@ -231,6 +242,7 @@ local function toggle_tcr()
     end
     watcher_terminal = require("snacks").terminal.open("bash", {
       cwd = lang_root,
+      auto_close = false,
       win = { position = "bottom", height = 0.2 },
     })
     -- Run tcr.sh on every save via jobstart (non-blocking)
@@ -280,8 +292,11 @@ local function toggle_tcr()
       watcher_terminal = nil
     end
     if lang_root and watcher_cmd then
-      watcher_terminal = require("snacks").terminal.open(watcher_cmd, {
+      local test_path = is_test_file(path) and path or get_alternate(path)
+      local cmd = build_watcher_cmd(watcher_cmd, file_cmd, lang_root, test_path)
+      watcher_terminal = require("snacks").terminal.open(cmd, {
         cwd = lang_root,
+        auto_close = false,
         win = { position = "bottom", height = 0.2 },
       })
     end

@@ -1,0 +1,67 @@
+#!/bin/bash
+set -euo pipefail
+
+if [ $# -lt 1 ]; then
+  echo "Usage: yt-transcript <youtube-url>" >&2
+  exit 1
+fi
+
+url="$1"
+
+uv run --with youtube-transcript-api python3 - "$url" <<'PYTHON'
+import sys, re, json, urllib.request, urllib.parse
+from youtube_transcript_api import YouTubeTranscriptApi
+from datetime import date
+
+url = sys.argv[1]
+
+# Extract video ID
+match = re.search(r'(?:v=|youtu\.be/|shorts/)([\w-]{11})', url)
+if not match:
+    print(f"Error: could not extract video ID from: {url}", file=sys.stderr)
+    sys.exit(1)
+video_id = match.group(1)
+
+# Get video title via oEmbed API
+oembed_url = f"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={video_id}&format=json"
+try:
+    with urllib.request.urlopen(oembed_url) as resp:
+        title = json.loads(resp.read())["title"]
+except Exception as e:
+    print(f"Error fetching video title: {e}", file=sys.stderr)
+    sys.exit(1)
+
+# Slugify title for filename
+slug = re.sub(r'[^\w\s-]', '', title.lower())
+slug = re.sub(r'[\s_]+', '-', slug).strip('-')
+slug = re.sub(r'-+', '-', slug)
+
+today = date.today().strftime("%Y-%m-%d")
+filename = f"transcript-{today}-{slug}.md"
+
+# Fetch transcript
+try:
+    api = YouTubeTranscriptApi()
+    transcript = api.fetch(video_id)
+except Exception as e:
+    print(f"Error fetching transcript: {e}", file=sys.stderr)
+    sys.exit(1)
+
+# Format and write
+with open(filename, 'w') as f:
+    f.write(f"# {title}\n\n")
+    f.write(f"**Source:** https://www.youtube.com/watch?v={video_id}\n")
+    f.write(f"**Date:** {today}\n\n")
+    f.write("---\n\n")
+    for entry in transcript:
+        seconds = int(entry.start)
+        minutes, secs = divmod(seconds, 60)
+        hours, minutes = divmod(minutes, 60)
+        if hours > 0:
+            timestamp = f"[{hours}:{minutes:02d}:{secs:02d}]"
+        else:
+            timestamp = f"[{minutes:02d}:{secs:02d}]"
+        f.write(f"{timestamp} {entry.text}\n")
+
+print(f"Saved: {filename}")
+PYTHON
