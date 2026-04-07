@@ -1,6 +1,6 @@
--- Elixir: Lexical LSP (via Mason) + credo linting via nvim-lint.
+-- Elixir: Expert LSP (official, built on Lexical) + credo linting via nvim-lint.
 -- DO NOT enable lazyvim.plugins.extras.lang.elixir — it installs elixir-ls,
--- which would double-attach alongside Lexical on .ex/.exs files.
+-- which would double-attach alongside Expert on .ex/.exs files.
 return {
   {
     "nvim-treesitter/nvim-treesitter",
@@ -10,11 +10,7 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        lexical = {
-          root_dir = function(fname)
-            return require("lspconfig.util").root_pattern("mix.exs", ".git")(fname)
-          end,
-        },
+        expert = {},
       },
     },
   },
