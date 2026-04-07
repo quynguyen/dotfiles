@@ -79,7 +79,15 @@ teardown() {
 }
 
 @test "check_health creates baseline on first run and returns empty diff" {
-  nvim() { echo "OK checkhealth output"; }
+  # Mock nvim: extract the w! target path from args and write content there
+  nvim() {
+    for arg in "$@"; do
+      if [[ "$arg" == +w!* ]]; then
+        local target="${arg#+w! }"
+        echo "OK checkhealth output" > "$target"
+      fi
+    done
+  }
   export -f nvim
   local baseline="$TMPDIR/checkhealth-baseline.txt"
 
@@ -90,7 +98,14 @@ teardown() {
 }
 
 @test "check_health diffs against existing baseline" {
-  nvim() { echo "ERROR nvim-lspconfig: broken"; }
+  nvim() {
+    for arg in "$@"; do
+      if [[ "$arg" == +w!* ]]; then
+        local target="${arg#+w! }"
+        echo "ERROR nvim-lspconfig: broken" > "$target"
+      fi
+    done
+  }
   export -f nvim
   local baseline="$TMPDIR/checkhealth-baseline.txt"
   echo "OK nvim-lspconfig: working" > "$baseline"

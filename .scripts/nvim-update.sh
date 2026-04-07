@@ -92,18 +92,22 @@ print(json.dumps(report, indent=2))
 # Runs checkhealth headlessly and diffs against the baseline.
 # On first run (no baseline), saves current output as baseline, returns empty.
 # On subsequent runs, returns the diff.
+# Note: checkhealth writes to a buffer, not stdout — must use :w! to capture.
 check_health() {
   local baseline_path="$1"
-  local current
-  current=$(nvim --headless +"checkhealth" +qa 2>&1 || true)
+  local tmpfile
+  tmpfile=$(mktemp)
+  nvim --headless +"checkhealth" +"w! $tmpfile" +qa 2>/dev/null || true
 
   if [[ ! -f "$baseline_path" ]]; then
-    echo "$current" > "$baseline_path"
+    cp "$tmpfile" "$baseline_path"
+    rm -f "$tmpfile"
     return 0
   fi
 
   local health_diff
-  health_diff=$(diff <(cat "$baseline_path") <(echo "$current") 2>/dev/null || true)
+  health_diff=$(diff "$baseline_path" "$tmpfile" 2>/dev/null || true)
+  rm -f "$tmpfile"
 
   if [[ -n "$health_diff" ]]; then
     echo "$health_diff"
@@ -250,7 +254,7 @@ print(json.dumps(rolled_back))
 
   # Update baseline on clean run
   if [[ "$status" == "clean" ]]; then
-    nvim --headless +"checkhealth" +qa 2>&1 > "$BASELINE_FILE" || true
+    nvim --headless +"checkhealth" +"w! $BASELINE_FILE" +qa 2>/dev/null || true
   fi
 
   rm -f "$snapshot"
