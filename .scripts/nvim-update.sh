@@ -11,37 +11,23 @@ ATTENTION_FLAG="$HOME/.nvim-update-attention"
 # diff_lockfile(old_lockfile, new_lockfile)
 # Outputs lines of "plugin|old_sha|new_sha" for plugins that changed.
 # Outputs nothing if lockfiles are identical.
+# Handles added/removed plugins correctly.
 diff_lockfile() {
   local old_file="$1"
   local new_file="$2"
 
-  # Extract plugin:sha pairs from each file, compare
-  local old_shas new_shas
-  old_shas=$(python3 -c "
+  python3 -c "
 import json, sys
 with open(sys.argv[1]) as f:
-    d = json.load(f)
-for k, v in sorted(d.items()):
-    print(f\"{k}|{v['commit']}\")
-" "$old_file")
-
-  new_shas=$(python3 -c "
-import json, sys
-with open(sys.argv[1]) as f:
-    d = json.load(f)
-for k, v in sorted(d.items()):
-    print(f\"{k}|{v['commit']}\")
-" "$new_file")
-
-  # Compare line by line, output changed plugins
-  paste <(echo "$old_shas") <(echo "$new_shas") | while IFS=$'\t' read -r old_line new_line; do
-    local plugin_old="${old_line%%|*}"
-    local sha_old="${old_line##*|}"
-    local sha_new="${new_line##*|}"
-    if [[ "$sha_old" != "$sha_new" ]]; then
-      echo "${plugin_old}|${sha_old}|${sha_new}"
-    fi
-  done
+    old = json.load(f)
+with open(sys.argv[2]) as f:
+    new = json.load(f)
+for plugin in sorted(set(old) | set(new)):
+    old_sha = old.get(plugin, {}).get('commit', '')
+    new_sha = new.get(plugin, {}).get('commit', '')
+    if old_sha != new_sha:
+        print(f'{plugin}|{old_sha}|{new_sha}')
+" "$old_file" "$new_file"
 }
 
 # scan_commits(plugin, old_sha, new_sha)
