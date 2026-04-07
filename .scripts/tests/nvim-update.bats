@@ -45,3 +45,20 @@ teardown() {
   run scan_commits "plugin-a" "oldsha" "newsha"
   [[ "$status" -eq 0 ]]
 }
+
+@test "check_startup exits 0 when nvim starts cleanly" {
+  nvim() { return 0; }
+  export -f nvim
+
+  run check_startup
+  [[ "$status" -eq 0 ]]
+}
+
+@test "check_startup exits 1 and captures error on failure" {
+  nvim() { echo "E5113: Error while calling lua chunk" >&2; return 1; }
+  export -f nvim
+
+  run check_startup
+  [[ "$status" -eq 1 ]]
+  [[ "$output" == *"E5113"* ]]
+}

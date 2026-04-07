@@ -65,6 +65,21 @@ scan_commits() {
   return 0
 }
 
+# check_startup()
+# Runs headless nvim and checks for clean startup.
+# Exits 0 if clean, exits 1 with error output on failure.
+check_startup() {
+  local output
+  output=$(nvim --headless +qa 2>&1)
+  local exit_code=$?
+
+  if [[ $exit_code -ne 0 ]] || [[ -n "$output" ]]; then
+    echo "$output"
+    return 1
+  fi
+  return 0
+}
+
 # Allow sourcing without executing main
 if [[ "${1:-}" == "--source-only" ]]; then
   return 0 2>/dev/null || true
