@@ -106,3 +106,9 @@ if command -v zoxide &> /dev/null; then
 else
   echo "zoxide not found - install with: brew install zoxide"
 fi
+
+# mise — polyglot version manager (Ruby, Node, etc.)
+# Must load AFTER brew shellenv, which calls path_helper and rebuilds PATH.
+if command -v mise &> /dev/null; then
+  eval "$(mise activate zsh)"
+fi
