@@ -12,10 +12,10 @@ local tcr_active = false
 local LANG_MARKERS = {
   { file = "mix.exs",          cmd = "mix test.watch",              file_cmd = "mix test.watch %s" },
   { file = "pyproject.toml",   cmd = "uv run ptw .",                file_cmd = "PYTEST_ADDOPTS='%s' uv run ptw ." },
-  { file = "package.json",     cmd = "pnpm vitest watch",           file_cmd = "pnpm vitest watch %s" },
   { file = "Gemfile",          cmd = "bundle exec guard" },
   { file = "build.gradle.kts", cmd = "./gradlew test --continuous" },
   { file = "build.gradle",     cmd = "./gradlew test --continuous" },
+  { file = "package.json",     cmd = "pnpm vitest watch",           file_cmd = "pnpm vitest watch %s" },
 }
 
 local function find_language_root(start_dir)
