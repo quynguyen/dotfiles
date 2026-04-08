@@ -7,4 +7,14 @@ return {
       },
     },
   },
+  {
+    "folke/flash.nvim",
+    opts = {
+      modes = {
+        treesitter = {
+          label = { before = false, after = false },
+        },
+      },
+    },
+  },
 }
