@@ -3,12 +3,8 @@
 -- Add any additional keymaps here
 
 -- Treesitter incremental selection: + to expand, - to shrink
-vim.keymap.set("n", "+", function()
-  require("nvim-treesitter.incremental_selection").init_selection()
+vim.keymap.set({ "n", "x" }, "+", function()
+  require("flash").treesitter({
+    actions = { ["+"] = "next", ["-"] = "prev" },
+  })
 end, { desc = "Expand selection" })
-vim.keymap.set("v", "+", function()
-  require("nvim-treesitter.incremental_selection").node_incremental()
-end, { desc = "Expand selection" })
-vim.keymap.set("v", "-", function()
-  require("nvim-treesitter.incremental_selection").node_decremental()
-end, { desc = "Shrink selection" })
