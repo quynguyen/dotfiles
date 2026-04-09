@@ -4,3 +4,6 @@
 CLAUDE.md
 .claude/settings.local.json
 .stow-packages/zsh/.zsh/private_exports
+
+# gstack — tool-managed git repo, too large to track
+.stow-packages/claude-code/.claude/skills/gstack/

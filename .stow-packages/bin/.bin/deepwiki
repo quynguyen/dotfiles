@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+API="https://mcp.deepwiki.com/mcp"
+HEADERS=(-H "Content-Type: application/json" -H "Accept: application/json, text/event-stream")
+
+call_mcp() {
+  local tool="$1" params="$2"
+  curl -sf -X POST "$API" "${HEADERS[@]}" \
+    -d "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"$tool\",\"arguments\":$params}}" \
+    2>/dev/null | grep '^data: ' | sed 's/^data: //' | jq -r '.result.content[]?.text // .result.result // .result // .error // "No result"' 2>/dev/null
+}
+
+usage() {
+  cat <<'EOF'
+deepwiki — AI-powered documentation for GitHub repositories
+
+Usage:
+  deepwiki topics <owner/repo>                List documentation topics
+  deepwiki docs <owner/repo>                  Full repository documentation
+  deepwiki ask <owner/repo> <question>        Ask a question about a repo
+  deepwiki ask <owner/repo,owner/repo2> <q>   Ask across multiple repos (max 10)
+
+Examples:
+  deepwiki topics prisma/prisma
+  deepwiki docs facebook/react
+  deepwiki ask vercel/next.js "how does the app router work?"
+EOF
+  exit 1
+}
+
+cmd="${1:-}"
+shift || usage
+
+case "$cmd" in
+  topics)
+    repo="${1:?Usage: deepwiki topics <owner/repo>}"
+    call_mcp "read_wiki_structure" "{\"repoName\":\"$repo\"}"
+    ;;
+  docs)
+    repo="${1:?Usage: deepwiki docs <owner/repo>}"
+    call_mcp "read_wiki_contents" "{\"repoName\":\"$repo\"}"
+    ;;
+  ask)
+    repo="${1:?Usage: deepwiki ask <owner/repo> <question>}"
+    shift
+    question="$*"
+    # Handle comma-separated repos as array
+    if [[ "$repo" == *","* ]]; then
+      repo_json=$(echo "$repo" | jq -R 'split(",")')
+      call_mcp "ask_question" "{\"repoName\":$repo_json,\"question\":\"$question\"}"
+    else
+      call_mcp "ask_question" "{\"repoName\":\"$repo\",\"question\":\"$question\"}"
+    fi
+    ;;
+  *)
+    usage
+    ;;
+esac

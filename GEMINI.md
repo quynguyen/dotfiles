@@ -43,9 +43,13 @@ brew install package-name
 # Update all Homebrew packages
 brew update && brew upgrade
 
-# Manage dotfile symlinks
-stow -D package-name  # unstow
-stow package-name     # stow
+# Manage dotfile symlinks (use convenience scripts)
+./.scripts/stow/create-home-dotfile-symlinks.sh
+./.scripts/stow/delete-home-dotfile-symlinks.sh
+
+# Manual stow (always specify target)
+stow -D package-name -t ~/ -d .stow-packages  # unstow
+stow package-name -t ~/ -d .stow-packages     # stow
 ```
 
 ### Configuration Management

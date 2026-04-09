@@ -1,0 +1,1 @@
+/Users/quy/dotfiles/.stow-packages/llm/.claude/skills/gstack/pair-agent/SKILL.md

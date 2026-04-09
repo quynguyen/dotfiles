@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+API="https://mcp.context7.com/mcp"
+HEADERS=(-H "Content-Type: application/json" -H "Accept: application/json, text/event-stream")
+
+call_mcp() {
+  local tool="$1" params="$2"
+  local raw
+  raw=$(curl -sf -X POST "$API" "${HEADERS[@]}" \
+    -d "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"$tool\",\"arguments\":$params}}" \
+    2>/dev/null)
+  # Handle both plain JSON and SSE (data: prefixed) responses
+  if echo "$raw" | grep -q '^data: '; then
+    echo "$raw" | grep '^data: ' | sed 's/^data: //' | jq -r '.result.content[]?.text // .result // .error // "No result"'
+  else
+    echo "$raw" | jq -r '.result.content[]?.text // .result // .error // "No result"'
+  fi
+}
+
+usage() {
+  cat <<'EOF'
+context7 — fetch up-to-date library documentation
+
+Usage:
+  context7 resolve <library>           Find Context7 library ID
+  context7 query <libraryId> <query>   Query docs for a library
+  context7 search <library> <query>    Resolve + query in one step
+
+Examples:
+  context7 resolve "next.js"
+  context7 query /vercel/next.js "app router middleware"
+  context7 search prisma "client api findMany"
+EOF
+  exit 1
+}
+
+cmd="${1:-}"
+shift || usage
+
+case "$cmd" in
+  resolve)
+    lib="${1:?Usage: context7 resolve <library>}"
+    call_mcp "resolve-library-id" "{\"libraryName\":\"$lib\",\"query\":\"$lib\"}"
+    ;;
+  query)
+    id="${1:?Usage: context7 query <libraryId> <query>}"
+    shift
+    query="$*"
+    call_mcp "query-docs" "{\"libraryId\":\"$id\",\"query\":\"$query\"}"
+    ;;
+  search)
+    lib="${1:?Usage: context7 search <library> <query>}"
+    shift
+    query="$*"
+    # Resolve library ID first
+    resolved=$(call_mcp "resolve-library-id" "{\"libraryName\":\"$lib\",\"query\":\"$query\"}")
+    # Extract first library ID (format: /org/project)
+    lib_id=$(echo "$resolved" | grep -oE '/[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+' | head -1)
+    if [ -z "$lib_id" ]; then
+      echo "Could not resolve library ID for '$lib'. Raw output:"
+      echo "$resolved"
+      exit 1
+    fi
+    echo "Using library: $lib_id"
+    echo "---"
+    call_mcp "query-docs" "{\"libraryId\":\"$lib_id\",\"query\":\"$query\"}"
+    ;;
+  *)
+    usage
+    ;;
+esac

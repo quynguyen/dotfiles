@@ -13,6 +13,7 @@ fi
 pushd "$(dirname ${BASH_SOURCE:-$0})/../../" >/dev/null
 
 export REPLACE_source=${BASH_SOURCE:-$0}
+export DOLLAR='$'
 export REPLACE_dotfiles_path=$(pwd)
 export REPLACE_home=$HOME
 export REPLACE_file='$file'

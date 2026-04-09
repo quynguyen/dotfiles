@@ -8,7 +8,7 @@ echo "**************************************************************************
 
 export DOTFILES_PATH="${REPLACE_dotfiles_path}"
 export REGENERATE_ZSHRC="${REPLACE_source}"
-export PATH="${REPLACE_home}/.local/bin:${REPLACE_home}/.bin/:${REPLACE_path}"
+export PATH="${REPLACE_home}/.local/bin:${REPLACE_home}/.bin:${REPLACE_home}/.claude/bin:${REPLACE_path}"
 # Load shell configuration to determine prompt type
 if [[ -f ~/.shell_config ]]; then
   source ~/.shell_config
@@ -24,11 +24,6 @@ if [[ "${REPLACE_dotfiles_shell_mode}" == "zsh-p10k" ]]; then
   # confirmations, etc.) must go above this block; everything else may go below.
   if [[ -r "${REPLACE_p10k_home}/p10k-instant-prompt-${REPLACE_p10k_prompt}.zsh" ]]; then
     source "${REPLACE_p10k_home}/p10k-instant-prompt-${REPLACE_p10k_prompt}.zsh"
-  fi
-elif [[ "${REPLACE_dotfiles_shell_mode}" == "zsh-starship" ]]; then
-  # Initialize Starship prompt
-  if command -v starship &> /dev/null; then
-    eval "$(starship init zsh)"
   fi
 fi
 
@@ -77,6 +72,12 @@ if [[ "${REPLACE_dotfiles_shell_mode}" == "zsh-p10k" ]]; then
 elif [[ "${REPLACE_dotfiles_shell_mode}" == "zsh-starship" ]]; then
   # Disable Powerlevel10k configuration wizard when using Starship
   export POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
+  # Initialize Starship prompt at the end to ensure it takes over
+  if command -v starship &> /dev/null; then
+    eval "$(starship init zsh)"
+    # Append a newline to the prompt since command substitution strips it
+    PROMPT="${DOLLAR}{PROMPT}"${DOLLAR}'\n'
+  fi
   echo "Using Starship prompt"
 fi
 
