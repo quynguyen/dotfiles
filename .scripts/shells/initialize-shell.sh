@@ -14,14 +14,10 @@ initialize_shell() {
 	case "$DOTFILES_SHELL_MODE" in
 		"zsh-p10k"|"zsh-starship")
 			echo "Initializing Zsh configuration..."
-			
+
 			# Zsh plugins
 			echo "Installing Zsh plugins..."
 			source .scripts/antidote/generated-zsh-plugins.sh
-			
-			# Generate ~/.zshrc
-			echo "Generating ~/.zshrc..."
-			source .scripts/zsh/generate-home-zshrc.sh
 			;;
 		"fish")
 			echo "Initializing Fish configuration..."
@@ -37,7 +33,6 @@ initialize_shell() {
 			echo "Unknown shell mode: $DOTFILES_SHELL_MODE"
 			echo "Falling back to zsh initialization..."
 			source .scripts/antidote/generated-zsh-plugins.sh
-			source .scripts/zsh/generate-home-zshrc.sh
 			;;
 	esac
 }

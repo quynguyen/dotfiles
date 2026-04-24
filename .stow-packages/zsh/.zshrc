@@ -1,10 +1,7 @@
 # vim: ft=zsh
 
-${REPLACE_warning}
-
-export DOTFILES_PATH="${REPLACE_dotfiles_path}"
-export REGENERATE_ZSHRC="${REPLACE_source}"
-export PATH="${REPLACE_home}/.local/bin:${REPLACE_home}/.bin:${REPLACE_home}/.claude/bin:${REPLACE_path}"
+export DOTFILES_PATH="$HOME/dotfiles"
+export PATH="$HOME/.local/bin:$HOME/.bin:$HOME/.claude/bin:$PATH"
 
 # Load shell configuration to determine prompt type
 if [[ -f ~/.shell_config ]]; then
@@ -15,12 +12,12 @@ fi
 DOTFILES_SHELL_MODE="${DOTFILES_SHELL_MODE:-zsh-p10k}"
 
 # Configure prompt based on shell mode
-if [[ "${REPLACE_dotfiles_shell_mode}" == "zsh-p10k" ]]; then
+if [[ "$DOTFILES_SHELL_MODE" == "zsh-p10k" ]]; then
   # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
   # Initialization code that may require console input (password prompts, [y/n]
   # confirmations, etc.) must go above this block; everything else may go below.
-  if [[ -r "${REPLACE_p10k_home}/p10k-instant-prompt-${REPLACE_p10k_prompt}.zsh" ]]; then
-    source "${REPLACE_p10k_home}/p10k-instant-prompt-${REPLACE_p10k_prompt}.zsh"
+  if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
   fi
 fi
 
@@ -32,14 +29,14 @@ bindkey -s '^o' 'yazicd\n'
 
 # Load includes
 for file in ~/.zsh/*; do
-  source ${REPLACE_file}
+  source $file
 done
 
 # Load plugins
 source ~/.zsh_plugins.sh
 
 # Load Homebrew
-if [[ "${REPLACE_ostype}" == "darwin"* ]]; then
+if [[ "$OSTYPE" == "darwin"* ]]; then
   if [[ -f "/opt/homebrew/bin/brew" ]]; then
     export PATH="/opt/homebrew/bin:$PATH"
     eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -55,16 +52,16 @@ else
 fi
 
 # Configure prompt
-if [[ "${REPLACE_dotfiles_shell_mode}" == "zsh-p10k" ]]; then
+if [[ "$DOTFILES_SHELL_MODE" == "zsh-p10k" ]]; then
   [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-elif [[ "${REPLACE_dotfiles_shell_mode}" == "zsh-starship" ]]; then
+elif [[ "$DOTFILES_SHELL_MODE" == "zsh-starship" ]]; then
   export POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
   if command -v starship &> /dev/null; then
     eval "$(starship init zsh)"
   fi
 fi
 
-if [[ -n "${REPLACE_tmux}" ]]; then
+if [[ -n "$TMUX" ]]; then
   export TERM=tmux-256color
 else
   export TERM=xterm-256color

@@ -28,7 +28,6 @@ The repository follows a modular, script-driven architecture:
 ./.scripts/stow/create-home-dotfile-symlinks.sh
 ./.scripts/mise/install-mise-tools.sh
 ./.scripts/antidote/generated-zsh-plugins.sh
-./.scripts/zsh/generate-home-zshrc.sh
 
 # Desktop applications are automatically included on macOS
 # Run separately if needed: ./.scripts/homebrew/install-desktop-apps.sh
@@ -67,7 +66,7 @@ tmux run-shell ~/.tmux/plugins/tpm/scripts/install_plugins.sh
 
 ## Key Configuration Files
 
-- `.stow-packages/zsh/.zshrc_template` - Main shell configuration template with variable substitution
+- `.stow-packages/zsh/.zshrc` - Main shell configuration (stowed directly to `~/.zshrc`; no templating)
 - `.stow-packages/tmux/.tmux.conf` - Comprehensive tmux configuration
 - `.stow-packages/nvim/.config/nvim-lazyvim/` - Neovim setup using LazyVim distribution
 - `.scripts/homebrew/install-homebrew-packages.sh` - Package definitions for Homebrew
@@ -164,14 +163,14 @@ When making changes:
 1. Test changes in isolation before running full `./install.sh`
 2. Use individual scripts for specific components
 3. Stow packages are modular - changes to one don't affect others
-4. The `.zshrc` file is generated from template - edit `.zshrc_template` instead
+4. Edit `.stow-packages/zsh/.zshrc` directly; it is symlinked to `~/.zshrc` via stow
 5. Custom scripts go in appropriate subdirectories under `bin/`
 
 ## Important Notes
 
 - Installation is idempotent - safe to run multiple times
 - Uses GNU Stow for symlink management - files are linked, not copied
-- Zsh configuration is template-based with variable substitution
+- Zsh configuration is a directly stowed file (`.stow-packages/zsh/.zshrc`)
 - Git submodules are used for tmux plugins
 - Homebrew provides consistent package management across platforms
 - Custom AI assistant configurations in `.cursor/` and `.claude/` directories
