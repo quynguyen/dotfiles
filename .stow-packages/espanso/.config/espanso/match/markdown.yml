@@ -51,3 +51,14 @@ matches:
   - trigger: ";check"
     replace: "- [ ] $|$"
     word: false
+
+  # Inline math: ;$ → $▌$
+  - trigger: ";$"
+    replace: "$$|$$"
+    word: false
+
+  # Block math: ;b$ → $$\n▌\n$$
+  - trigger: ";b$"
+    replace: "$$\n$|$\n$$"
+    word: false
+    force_clipboard: true

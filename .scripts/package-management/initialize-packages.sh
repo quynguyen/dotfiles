@@ -56,13 +56,6 @@ initialize_package_manager() {
             else
                 echo "Warning: Homebrew packages script not found"
             fi
-            
-            # Install custom packages (non-Homebrew)
-            if [[ -f ".scripts/homebrew/install-custom-packages.sh" ]]; then
-                source .scripts/homebrew/install-custom-packages.sh
-            else
-                echo "Warning: Custom packages script not found"
-            fi
             ;;
         "nix")
             echo "********************************************************************************"

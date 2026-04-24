@@ -43,8 +43,23 @@ export REPLACE_warning=$(
 # Go back
 popd >/dev/null
 
-# Generate a .zshrc from a template, REPLACING in ${USER}-specific values
-envsubst <~/.zshrc_template >~/.zshrc
+# Generate a .zshrc from a template, REPLACING in ${USER}-specific values.
+# Pass an allow-list so envsubst only substitutes our REPLACE_* placeholders
+# and leaves runtime shell variables like ${PATH}, ${TERM}, ${TMUX}, and
+# zsh loop variables like ${file} untouched.
+envsubst '
+	${REPLACE_warning}
+	${REPLACE_dotfiles_path}
+	${REPLACE_source}
+	${REPLACE_home}
+	${REPLACE_path}
+	${REPLACE_file}
+	${REPLACE_p10k_home}
+	${REPLACE_p10k_prompt}
+	${REPLACE_ostype}
+	${REPLACE_dotfiles_shell_mode}
+	${REPLACE_tmux}
+' <~/.zshrc_template >~/.zshrc
 
 # for interactive shells
 if [[ $- == *i* ]]; then

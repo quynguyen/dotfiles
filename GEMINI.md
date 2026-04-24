@@ -25,8 +25,8 @@ The repository follows a modular, script-driven architecture:
 
 # Individual component setup
 ./.scripts/homebrew/install-homebrew-packages.sh
-./.scripts/homebrew/install-custom-packages.sh
 ./.scripts/stow/create-home-dotfile-symlinks.sh
+./.scripts/mise/install-mise-tools.sh
 ./.scripts/antidote/generated-zsh-plugins.sh
 ./.scripts/zsh/generate-home-zshrc.sh
 
@@ -71,6 +71,8 @@ tmux run-shell ~/.tmux/plugins/tpm/scripts/install_plugins.sh
 - `.stow-packages/tmux/.tmux.conf` - Comprehensive tmux configuration
 - `.stow-packages/nvim/.config/nvim-lazyvim/` - Neovim setup using LazyVim distribution
 - `.scripts/homebrew/install-homebrew-packages.sh` - Package definitions for Homebrew
+- `.stow-packages/mise/.config/mise/config.toml` - Language runtimes managed by mise (node, pnpm, ruby, bun, rust)
+- `.scripts/mise/install-mise-tools.sh` - Runs `mise install` after stow deploys the config
 - `.scripts/antidote/generated-zsh-plugins.sh` - Zsh plugin management with Antidote
 
 ## Tools and Systems Managed
@@ -132,39 +134,28 @@ The desktop applications are automatically installed on macOS as part of `./inst
 
 Note: Desktop apps require interactive installation (admin password) and are macOS-specific.
 
-### Custom Package Management
+### Language Runtime Management (mise)
 
-The custom packages script (`.scripts/homebrew/install-custom-packages.sh`) handles tools not available through Homebrew:
+Language runtimes are managed by [mise](https://mise.jdx.dev), declared in
+`.stow-packages/mise/.config/mise/config.toml` and installed by
+`.scripts/mise/install-mise-tools.sh`.
 
-**When to use:**
+**Currently managed:**
 
-- Installing development tools not in Homebrew package registry
-- Tools that require custom installation methods
-- Runtime managers and language-specific toolchains
+- **node** + **pnpm** — JavaScript/TypeScript toolchain
+- **ruby** — Ruby interpreter
+- **bun** — Fast all-in-one JavaScript runtime and package manager
+- **rust** — Rust toolchain (rustup + stable)
 
-**Currently managed custom packages:**
+**Why mise:** single source of truth for runtime versions, avoids shadowing
+between Homebrew and project-level installs, and lets projects override via
+`.mise.toml`.
 
-- **Bun** - Fast all-in-one JavaScript runtime and package manager
+**Bootstrap order (from `install.sh`):**
 
-**Installation process:**
-
-- Uses official installation scripts when available
-- Configures PATH and shell integration automatically
-- Idempotent - safe to run multiple times
-- Automatically called during `./install.sh`
-
-**Usage:**
-
-```bash
-# Run separately (after Homebrew packages)
-./.scripts/homebrew/install-custom-packages.sh
-```
-
-**Architecture benefits:**
-
-- Clean separation between package managers
-- Extensible for future custom installations (rustup, volta, etc.)
-- Maintains dotfiles portability across environments
+1. `brew install mise` (in `install-homebrew-packages.sh`)
+2. `stow` deploys `~/.config/mise/config.toml` (in `create-home-dotfile-symlinks.sh`)
+3. `mise install` fetches declared tools (in `install-mise-tools.sh`)
 
 ## Development Workflow
 

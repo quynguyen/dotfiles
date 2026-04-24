@@ -6,7 +6,7 @@ Read the latest Neovim plugin update report and fix any issues.
 
 1. Find the latest report in `~/.local/share/nvim/update-reports/`. Read the newest `.json` file by date.
 
-2. If the report status is `clean`, say "Everything's fine, nothing to fix" and stop.
+2. If the report status is `clean`, run `nvim-update-ack.sh` to clear any stale attention flag, say "Everything's fine, nothing to fix" and stop.
 
 3. If status is `needs_attention` or `startup_failure`:
 
@@ -38,7 +38,7 @@ d. If no references found: no action needed
    git commit -m "fix(nvim): adapt plugin config to upstream changes"
    ```
 
-5. Clear the attention flag: `rm -f ~/.nvim-update-attention`
+5. Clear the attention flag: `nvim-update-ack.sh`
 
 6. Summarize: what was fixed, what was re-updated, and what manual testing is recommended (list specific keymaps or features to verify interactively).
 
@@ -47,4 +47,4 @@ d. If no references found: no action needed
 - Do NOT run `:Lazy update` — the daily script owns updates
 - If a fix requires changing LazyVim extras config (lazyvim.json), flag it for manual review instead of changing it
 - Always verify with headless startup check after each fix
-- If the report is missing or unparseable, say so and suggest running `~/dotfiles/.scripts/nvim-update.sh` manually
+- If the report is missing or unparseable, say so and suggest running `nvim-update.sh` manually

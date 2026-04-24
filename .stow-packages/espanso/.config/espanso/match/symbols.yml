@@ -1,0 +1,38 @@
+matches:
+  # --- Currency ---
+  - trigger: ";eur"
+    replace: "€"
+    word: false
+
+  - trigger: ";gbp"
+    replace: "£"
+    word: false
+
+  - trigger: ";yen"
+    replace: "¥"
+    word: false
+
+  - trigger: ";won"
+    replace: "₩"
+    word: false
+
+  - trigger: ";rupee"
+    replace: "₹"
+    word: false
+
+  - trigger: ";btc"
+    replace: "₿"
+    word: false
+
+  - trigger: ";dong"
+    replace: "₫"
+    word: false
+
+  # --- Marks ---
+  - trigger: ";tm"
+    replace: "™"
+    word: false
+
+  - trigger: ";reg"
+    replace: "®"
+    word: false

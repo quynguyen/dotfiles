@@ -1,0 +1,11 @@
+# Yazi keymap configuration
+# See https://yazi-rs.github.io/docs/configuration/keymap/
+#
+# Default keymappings are already well-designed.
+# This file is provided for customization as needed.
+#
+# Example custom keybinding:
+# [[manager.keymap]]
+# on = [ "C" ]
+# run = "shell 'code $@' --block --confirm"
+# desc = "Open selected file with code"

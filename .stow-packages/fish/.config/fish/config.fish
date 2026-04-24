@@ -50,6 +50,7 @@ alias l ll
 
 # Application aliases
 alias lg lazygit
+alias c yazi
 alias cl clear
 alias n nvim
 alias cat bat
@@ -112,11 +113,10 @@ else
     echo "zoxide not found - install with: brew install zoxide"
 end
 
-# lf file manager integration - change directory on exit
-function lfcd
+# yazi file manager integration - change directory on exit
+function yazicd
     set tmp (mktemp)
-    # `command` is needed in case `lfcd` is aliased to `lf`
-    command lf -last-dir-path="$tmp" $argv
+    yazi --cwd-file="$tmp" $argv
     if test -f "$tmp"
         set dir (cat "$tmp")
         rm -f "$tmp"
@@ -128,14 +128,11 @@ function lfcd
     end
 end
 
-# Bind Ctrl+O to lfcd for quick file navigation
+# Bind Ctrl+O to yazicd for quick file navigation
 # Only set up bindings if we're in an interactive session
 if status --is-interactive
-    bind \co 'lfcd; commandline -f repaint'
+    bind \co 'yazicd; commandline -f repaint'
 end
-
-# Alternative: create an alias 'd' for lfcd (like in Zsh)
-alias d='lfcd'
 
 # For Spin (Shopify development environment)
 if test -f /opt/dev/dev.sh

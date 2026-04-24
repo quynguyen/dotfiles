@@ -8,8 +8,7 @@ alias ls="ls --color=auto"
 alias ll="ls -al"
 alias l="ll"
 alias lg="lazygit"
-alias lf="lfcd"
-alias c="lfcd"
+alias c="yazicd"
 alias cl="clear"
 alias n="nvim"
 alias cat="bat"
@@ -35,6 +34,7 @@ alias wl="wt list"
 alias wm="wt merge"
 alias ws="wt switch"
 alias wr="wt remove"
+alias cc="claude --dangerously-skip-permissions"
 
 if [[ `uname` != "Darwin" ]]; then
 	if [[ `which xsel 2> /dev/null` ]]; then

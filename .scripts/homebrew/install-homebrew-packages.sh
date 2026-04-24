@@ -29,13 +29,10 @@ brew install tmux
 brew install neovim
 brew install unzip || true # May already be installed
 
-# Language runtimes
-echo "Installing language runtimes..."
-brew install ruby@3.1
-brew install node
-brew install npm
-brew install pnpm
-brew install rust
+# Language runtimes are managed by mise (~/.config/mise/config.toml).
+# mise installs node, pnpm, ruby, bun, and rust from its config after stow.
+echo "Installing mise (language runtime manager)..."
+brew install mise
 
 # CLI utilities
 echo "Installing CLI utilities..."
@@ -46,7 +43,7 @@ brew install antidote
 brew install tmuxinator
 brew install bat
 brew install source-highlight
-brew install lf
+brew install yazi           # Terminal file browser
 brew install fzf
 brew install ripgrep
 brew install direnv
@@ -58,6 +55,16 @@ echo "Installing shell alternatives and themes..."
 brew install fish
 brew install nushell
 brew install starship
+
+# Yazi preview dependencies
+echo "Installing Yazi preview dependencies..."
+brew install ffmpeg       # Video preview
+brew install poppler      # PDF preview
+brew install imagemagick  # Font, HEIC, JPEG XL preview
+brew install resvg        # SVG preview
+brew install sevenzip     # Archive extraction and preview
+brew install jq           # JSON preview (already installed above, but listed for completeness)
+brew install fd           # File searching (already installed above, but listed for completeness)
 
 # Platform-specific packages
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then

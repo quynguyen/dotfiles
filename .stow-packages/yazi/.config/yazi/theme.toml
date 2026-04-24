@@ -1,0 +1,12 @@
+# Yazi theme configuration
+# See https://yazi-rs.github.io/docs/configuration/theme/
+#
+# Yazi comes with built-in themes. To use them, set the flavor:
+# Use one of: catppuccin-frappe, catppuccin-latte, catppuccin-macchiato, catppuccin-mocha,
+#             dracula, everforest, gruvbox-dark, gruvbox-light, nord, one-dark, solarized-dark, solarized-light,
+#             tokyo-night, ayu
+#
+# For detailed customization, see https://yazi-rs.github.io/docs/configuration/theme/
+
+[flavor]
+use = "catppuccin-mocha"

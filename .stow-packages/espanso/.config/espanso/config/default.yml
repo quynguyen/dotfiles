@@ -7,3 +7,6 @@ backend: inject
 
 # Backspace after an expansion reverts to the original typed trigger
 undo_backspace: true
+
+# Free up OPTION+SPACE for Raycast — use SHIFT+OPTION+SPACE instead
+search_shortcut: SHIFT+ALT+SPACE

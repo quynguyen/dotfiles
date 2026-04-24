@@ -9,6 +9,9 @@ source .scripts/package-management/initialize-packages.sh
 # $HOME dotfiles
 source .scripts/stow/create-home-dotfile-symlinks.sh
 
+# mise-managed language runtimes (needs stow symlink for ~/.config/mise/config.toml)
+source .scripts/mise/install-mise-tools.sh
+
 # Shell-specific initialization
 source .scripts/shells/initialize-shell.sh
 

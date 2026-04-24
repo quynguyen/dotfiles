@@ -31,7 +31,8 @@
     "claude-md-management@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": false,
     "claude-code-setup@claude-plugins-official": false,
-    "interface-design@interface-design": true
+    "interface-design@interface-design": true,
+    "andrej-karpathy-skills@karpathy-skills": true
   },
   "extraKnownMarketplaces": {
     "interface-design": {
@@ -39,15 +40,24 @@
         "source": "github",
         "repo": "Dammyjay93/interface-design"
       }
+    },
+    "karpathy-skills": {
+      "source": {
+        "source": "github",
+        "repo": "forrestchang/andrej-karpathy-skills"
+      }
     }
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
   "autoUpdatesChannel": "latest",
-  "voiceEnabled": true,
   "autoDreamEnabled": true,
   "skipDangerousModePermissionPrompt": true,
+  "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754080918068
-  }
+  },
+  "editorMode": "vim",
+  "autoCompactEnabled": false,
+  "agentPushNotifEnabled": true
 }

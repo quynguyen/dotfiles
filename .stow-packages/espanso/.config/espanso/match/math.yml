@@ -1,0 +1,127 @@
+matches:
+  # --- Operators
+  - trigger: ";union"
+    replace: "∪"
+    word: false
+
+  - trigger: ";inter"
+    replace: "∩"
+    word: false
+
+  - trigger: ";="
+    replace: "≡"
+    word: false
+
+  - trigger: ";neq"
+    replace: "≠"
+    word: false
+
+  - trigger: ";approx"
+    replace: "≈"
+    word: false
+
+  - trigger: ";leq"
+    replace: "≤"
+    word: false
+
+  - trigger: ";geq"
+    replace: "≥"
+    word: false
+
+  - trigger: ";pm"
+    replace: "±"
+    word: false
+
+  - trigger: ";times"
+    replace: "×"
+    word: false
+
+  - trigger: ";div"
+    replace: "÷"
+    word: false
+
+  - trigger: ";sqrt"
+    replace: "√"
+    word: false
+
+  - trigger: ";inf"
+    replace: "∞"
+    word: false
+
+  # --- Constants / Greek ---
+  - trigger: ";alpha"
+    replace: "α"
+    word: false
+
+  - trigger: ";beta"
+    replace: "β"
+    word: false
+
+  - trigger: ";gamma"
+    replace: "γ"
+    word: false
+
+  - trigger: ";lambda"
+    replace: "λ"
+    word: false
+
+  - trigger: ";epsilon"
+    replace: "ε"
+    word: false
+
+  - trigger: ";phi"
+    replace: "φ"
+    word: false
+
+  - trigger: ";omega"
+    replace: "Ω"
+    word: false
+
+  - trigger: ";rho"
+    replace: "ρ"
+    word: false
+
+  - trigger: ";pi"
+    replace: "π"
+    word: false
+
+  - trigger: ";delta"
+    replace: "Δ"
+    word: false
+
+  - trigger: ";theta"
+    replace: "θ"
+    word: false
+
+  - trigger: ";sum"
+    replace: "∑"
+    word: false
+
+  # --- Set / Logic ---
+  - trigger: ";elem"
+    replace: "∈"
+    word: false
+
+  - trigger: ";notelem"
+    replace: "∉"
+    word: false
+
+  - trigger: ";forall"
+    replace: "∀"
+    word: false
+
+  - trigger: ";exists"
+    replace: "∃"
+    word: false
+
+  - trigger: ";implies"
+    replace: "⟹"
+    word: false
+
+  - trigger: ";iff"
+    replace: "⟺"
+    word: false
+
+  - trigger: ";empty"
+    replace: "∅"
+    word: false

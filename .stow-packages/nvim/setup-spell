@@ -1,0 +1,76 @@
+#!/bin/bash
+# Setup SCOWL spell file for Neovim
+# Downloads comprehensive English word lists with technical term coverage
+
+set -e
+
+SPELL_DIR="${HOME}/.config/nvim/spell"
+mkdir -p "$SPELL_DIR"
+
+echo "Downloading SCOWL word lists..."
+cd /tmp
+
+# Download SCOWL archives (scowl-2020.12.07.tar.gz or latest)
+# Using the final/english-words.txt which is comprehensive
+curl -fsSL "https://www.cs.hmc.edu/~geoff/scowl/scowl-2020.12.07.tar.gz" -o scowl.tar.gz 2>/dev/null || {
+  echo "Failed to download from primary source. Trying alternative..."
+  # Alternative: use a simpler approach with multiple lists
+  echo "Building from individual word lists..."
+}
+
+if [ -f scowl.tar.gz ]; then
+  tar xzf scowl.tar.gz
+  # Combine relevant word lists for comprehensive coverage
+  # Using 70 (advanced) with additional technical terms
+  cat scowl-2020.12.07/final/english-words-70.txt > /tmp/words.txt
+  rm -rf scowl-2020.12.07 scowl.tar.gz
+else
+  # Fallback: create a minimal enhanced dictionary from system dictionary
+  echo "Using system dictionary as base..."
+  cat /usr/share/dict/words > /tmp/words.txt 2>/dev/null || {
+    echo "System dictionary not found. Please download SCOWL manually:"
+    echo "https://www.cs.hmc.edu/~geoff/scowl/"
+    exit 1
+  }
+fi
+
+# Add common technical/programming terms
+cat >> /tmp/words.txt << 'TECH_WORDS'
+Treesitter
+async
+await
+callback
+keybinding
+polyglot
+TCR
+LSP
+formatter
+linter
+debugger
+breakpoint
+multiline
+CamelCase
+camelCase
+snake_case
+weirdly
+TECH_WORDS
+
+# Remove duplicates and sort
+sort -u /tmp/words.txt > "$SPELL_DIR/en.utf-8.add"
+
+# Generate the compiled spell file
+echo "Compiling spell file (this requires Neovim)..."
+nvim -N -u NONE -es +'set spellfile='$SPELL_DIR'/en.utf-8.add' +'mkspell! '$SPELL_DIR'/en.utf-8' '+qa' 2>/dev/null || {
+  echo "⚠ Spell file compilation requires Neovim. Running: mkspell in Neovim..."
+  nvim +'set spellfile='$SPELL_DIR'/en.utf-8.add | mkspell! '$SPELL_DIR'/en.utf-8' '+qa!' 2>/dev/null
+}
+
+if [ -f "$SPELL_DIR/en.utf-8.spl" ]; then
+  echo "✓ Spell file created at $SPELL_DIR/en.utf-8.spl"
+  ls -lh "$SPELL_DIR/en.utf-8"*
+else
+  echo "✗ Failed to create spell file. Try running mkspell manually in Neovim:"
+  echo "  :mkspell! ~/.config/nvim/spell/en.utf-8"
+fi
+
+rm -f /tmp/words.txt

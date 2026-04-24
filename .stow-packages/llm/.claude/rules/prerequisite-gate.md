@@ -24,3 +24,13 @@ Every plan excludes something. Make the exclusion deliberate, not accidental. As
 If the straightforward answer feels too easy, pause. Is the question simpler than it looks, or are you pattern-matching to a familiar shape that doesn't actually fit? The cost of slowing down for 10 seconds is nothing. The cost of building on a wrong premise is everything downstream.
 
 Scale to scope: a small code fix needs a moment of "am I solving the right thing?" A multi-day plan needs all four checks explicitly.
+
+## How to present these checks
+
+Write in readable prose, not telegraphic fragments. When you surface tradeoffs or options, each one should be a complete sentence or short paragraph that stands on its own — a reader should follow the argument the first time through without decoding.
+
+Avoid Morse-code bullet formats like "Default: X. Why: Y. Alternative: Z. Tradeoff: W. Punt: V." The labels save words but shift the work of reconstructing sentences onto the reader. Prefer:
+
+> The default is to measure in-process handler invocation — same setup as the parity tests, stable in CI, cheap to add. The alternative, end-to-end against dev servers, is more realistic for user-perceived latency but noisy and hard to run in CI. I'd punt end-to-end to a follow-up slice unless you want it now.
+
+Concision means removing unnecessary words, not removing connective tissue. One sentence per option, connected by "because" and "but," beats five labeled bullets. If the explanation genuinely needs structure (3+ independent decisions, each with its own tradeoff), use short paragraphs under a heading — not nested bullets with bolded mini-labels.

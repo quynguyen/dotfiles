@@ -44,7 +44,7 @@ alias l = ll
 
 # Application aliases
 alias lg = lazygit
-alias c = lf
+alias c = yazi
 alias cl = clear
 alias n = nvim
 alias cat = bat

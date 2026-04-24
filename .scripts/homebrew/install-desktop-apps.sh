@@ -83,18 +83,15 @@ if [[ ! -d "$CLAUDIA_APP" ]]; then
     # Build Claudia
     cd "$CLAUDIA_DIR"
     
-    # Ensure Bun is in PATH
-    export PATH="$HOME/.bun/bin:$PATH"
-    
-    # Check for required dependencies
+    # Bun and Rust are provided by mise (see ~/.config/mise/config.toml).
     if ! command -v bun &> /dev/null; then
-        echo "Error: Bun is required to build Claudia. Run install-custom-packages.sh first."
+        echo "Error: Bun is required to build Claudia. Ensure mise is installed and 'mise install' has run."
         echo "PATH: $PATH"
         return 1
     fi
-    
+
     if ! command -v rustc &> /dev/null; then
-        echo "Error: Rust is required to build Claudia. Run install-homebrew-packages.sh first."
+        echo "Error: Rust is required to build Claudia. Ensure mise is installed and 'mise install' has run."
         echo "PATH: $PATH"
         return 1
     fi

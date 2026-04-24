@@ -1,0 +1,18 @@
+#!/bin/sh
+
+if [ -z "$1" ]; then
+  echo "Usage: portkill <port>"
+  echo "Kills the process running on the specified port"
+  exit 1
+fi
+
+PORT=$1
+PID=$(lsof -t -i :$PORT 2>/dev/null)
+
+if [ -z "$PID" ]; then
+  echo "No process found on port $PORT"
+  exit 1
+fi
+
+kill -9 $PID
+echo "Killed process $PID on port $PORT"

@@ -7,3 +7,6 @@
 if vim.fn.isdirectory("/opt/homebrew/opt/ruby/bin") == 1 then
   vim.env.PATH = "/opt/homebrew/opt/ruby/bin:" .. vim.env.PATH
 end
+
+-- Use custom SCOWL spell file for better technical term coverage
+vim.opt.spellfile = vim.fn.expand("~/.config/nvim/spell/en.utf-8.add")

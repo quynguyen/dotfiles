@@ -8,10 +8,38 @@ return {
       mode = "legacy",
       provider = "gemini",
       providers = {
+        -- Read key from macOS Keychain instead of env var.
+        -- Store once with: security add-generic-password -a "$USER" -s GEMINI_API_KEY -w "your-key"
+        --
+        -- disable_tools: prevents Avante from sending tool definitions to Gemini,
+        -- which stops Gemini returning UNEXPECTED_TOOL_CALL as a finishReason.
         gemini = {
           model = "gemini-2.5-pro",
-          -- Read key from macOS Keychain instead of env var.
-          -- Store once with: security add-generic-password -a "$USER" -s GEMINI_API_KEY -w "your-key"
+          disable_tools = true,
+          api_key_name = "cmd:security find-generic-password -a " .. vim.fn.expand("$USER") .. " -s GEMINI_API_KEY -w",
+        },
+        ["gemini-flash"] = {
+          __inherited_from = "gemini",
+          model = "gemini-2.5-flash",
+          disable_tools = true,
+          api_key_name = "cmd:security find-generic-password -a " .. vim.fn.expand("$USER") .. " -s GEMINI_API_KEY -w",
+        },
+        ["gemini-flash-lite"] = {
+          __inherited_from = "gemini",
+          model = "gemini-2.5-flash-lite",
+          disable_tools = true,
+          api_key_name = "cmd:security find-generic-password -a " .. vim.fn.expand("$USER") .. " -s GEMINI_API_KEY -w",
+        },
+        ["gemini-3-flash"] = {
+          __inherited_from = "gemini",
+          model = "gemini-3-flash-preview",
+          disable_tools = true,
+          api_key_name = "cmd:security find-generic-password -a " .. vim.fn.expand("$USER") .. " -s GEMINI_API_KEY -w",
+        },
+        ["gemini-3-pro"] = {
+          __inherited_from = "gemini",
+          model = "gemini-3.1-pro-preview",
+          disable_tools = true,
           api_key_name = "cmd:security find-generic-password -a " .. vim.fn.expand("$USER") .. " -s GEMINI_API_KEY -w",
         },
       },

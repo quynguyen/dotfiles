@@ -1,0 +1,19 @@
+# Yazi configuration
+# See https://yazi-rs.github.io/docs/configuration/yazi/
+
+# Manager behavior
+[mgr]
+sort_by = "alphabetical"
+sort_sensitive = false
+sort_reverse = false
+show_hidden = true
+show_symlink = true
+
+# Preview pane configuration
+[preview]
+uifill = true
+tab_size = 2
+
+# Mouse support
+[mouse]
+enabled = false
