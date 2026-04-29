@@ -1,7 +1,7 @@
 # vim: ft=zsh
 
 export DOTFILES_PATH="$HOME/dotfiles"
-export PATH="$HOME/.local/bin:$HOME/.bin:$HOME/.claude/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.bin:$HOME/.claude/bin:$HOME/.bun/bin:$PATH"
 
 # Load shell configuration to determine prompt type
 if [[ -f ~/.shell_config ]]; then
