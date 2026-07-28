@@ -88,3 +88,9 @@ fi
 
 # Worktrunk
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
+
+# wt alias for bare repo + worktrees layout
+alias wtb="wt --config ~/.config/worktrunk/bare.toml"
+
+# bun completions
+[ -s "/Users/quy/.bun/_bun" ] && source "/Users/quy/.bun/_bun"

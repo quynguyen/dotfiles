@@ -62,3 +62,39 @@ matches:
     replace: "$$\n$|$\n$$"
     word: false
     force_clipboard: true
+
+  # LaTeX brackets
+  - trigger: ";l("
+    replace: "\\left( $|$ \\right)"
+    word: false
+
+  - trigger: ";l["
+    replace: "\\left[ $|$ \\right]"
+    word: false
+
+  - trigger: ";l{"
+    replace: "\\left\\{ $|$ \\right\\}"
+    word: false
+
+  # LaTeX align block: ;align → \begin{align}...\end{align}
+  - trigger: ";align"
+    replace: "\\begin{align}\n$|$\n\\end{align}"
+    word: false
+    force_clipboard: true
+
+  # LaTeX fraction: ;frac → \frac{▌}{}
+  - trigger: ";frac"
+    replace: "\\frac{$|$}{}"
+    word: false
+
+  # LaTeX bmatrix: ;matb → \begin{bmatrix}\n▌\n\end{bmatrix}
+  - trigger: ";matb"
+    replace: "\\begin{bmatrix}\n$|$\n\\end{bmatrix}"
+    word: false
+    force_clipboard: true
+
+  # LaTeX pmatrix: ;matp → \begin{pmatrix}\n▌\n\end{pmatrix}
+  - trigger: ";matp"
+    replace: "\\begin{pmatrix}\n$|$\n\\end{pmatrix}"
+    word: false
+    force_clipboard: true

@@ -1,2 +1,12 @@
-# Initialize zsh completion system before plugins
+# Initialize zsh completion system before plugins.
+#
+# Guard against a stale exported FPATH. `brew shellenv` exports FPATH, so when
+# zsh is upgraded the old version-pinned Cellar path (e.g. .../zsh/5.9) stays
+# frozen in the environment inherited by long-running parents (login session,
+# tmux server). Its functions dir vanishes on upgrade, breaking the autoload of
+# compinit/compdef/is-at-least/add-zsh-hook in every new shell.
+typeset -U fpath                                       # keep fpath unique (brew shellenv re-evals duplicate entries)
+fpath=($^fpath(N-/))                                   # drop dirs that no longer exist
+(( ${fpath[(I)*/zsh/functions]} )) || \
+  fpath+=(${HOMEBREW_PREFIX:-/opt/homebrew}/share/zsh/functions(N-/))  # restore core functions dir
 autoload -Uz compinit && compinit

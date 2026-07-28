@@ -40,6 +40,10 @@ brew install --cask google-drive
 echo "Installing Logseq..."
 brew install --cask logseq
 
+# Obsidian for note-taking and personal knowledge base
+echo "Installing Obsidian..."
+brew install --cask obsidian
+
 # Claude Desktop - Official Anthropic Claude AI desktop app
 echo "Installing Claude Desktop..."
 brew install --cask claude
@@ -145,6 +149,7 @@ echo "Applications installed:"
 echo "  - JetBrains Mono Nerd Font (for terminal)"
 echo "  - Google Drive (cloud storage)"
 echo "  - Logseq (knowledge management)"
+echo "  - Obsidian (note-taking and personal knowledge base)"
 echo "  - Claude Desktop (official Anthropic AI app)"
 echo "  - ChatGPT Desktop (official OpenAI app)"
 echo "  - Docker Desktop (container management and development)"
