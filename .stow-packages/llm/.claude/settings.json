@@ -3,9 +3,17 @@
   "cleanupPeriodDays": 365,
   "env": {},
   "permissions": {
-    "allow": [],
+    "allow": [
+      "Bash(bun run typecheck)",
+      "Bash(bun run lint)",
+      "Bash(bun run verify)"
+    ],
     "deny": [],
-    "defaultMode": "default"
+    "additionalDirectories": [
+      "~/.claude",
+      "~/dotfiles"
+    ],
+    "defaultMode": "dontAsk"
   },
   "statusLine": {
     "type": "command",
