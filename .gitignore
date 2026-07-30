@@ -6,6 +6,8 @@ CLAUDE.md
 # negation `pre-opus5-reset` silently omitted it and the rollback tag was
 # incomplete.
 !.stow-packages/llm/.claude/CLAUDE.md
+# ...and archived copies of it, which exist precisely to survive this rule.
+!.stow-packages/llm/.claude/ablate/archive/**/CLAUDE.md
 .claude/settings.local.json
 .stow-packages/zsh/.zsh/private_exports
 
