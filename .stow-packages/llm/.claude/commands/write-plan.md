@@ -20,7 +20,7 @@ Write an implementation plan that favours red-green TDD, organizes tasks for wor
    - Use `$ARGUMENTS` as the basis, or infer from conversation context
    - If nothing can be inferred, ask the user
 
-2. **Write the plan** applying TDD discipline and frontend skills rules as applicable:
+2. **Write the plan** applying TDD discipline as applicable:
    - Each task should answer: "What failing test kicks this off?"
    - Define behavior precisely enough for assertions
    - Order steps for incremental red-green-refactor
@@ -31,7 +31,7 @@ Write an implementation plan that favours red-green TDD, organizes tasks for wor
    - Each chunk: a logical unit that can be developed, tested, and merged independently
    - Specify which chunks can be parallelized vs have sequential dependencies
 
-4. **Run the coherence check** per the coherence-check rule.
+4. **Check coherence:** does each step build only on the ones before it, do the parts agree, and is anything missing that would leave a half-finished state? Then ask whether you answered the question asked or an easier one, and whether your confidence rests on evidence or on the text simply reading well.
 
 5. **Write the file:**
    - Save to project root or `plans/` directory if one exists

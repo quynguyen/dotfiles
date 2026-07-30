@@ -5,7 +5,7 @@
   "permissions": {
     "allow": [],
     "deny": [],
-    "defaultMode": "dontAsk"
+    "defaultMode": "default"
   },
   "statusLine": {
     "type": "command",
@@ -22,17 +22,17 @@
     "lua-lsp@claude-plugins-official": true,
     "kotlin-lsp@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
-    "tdd-workflows@claude-code-workflows": true,
-    "superpowers@claude-plugins-official": true,
-    "quantitative-trading@claude-code-workflows": true,
+    "tdd-workflows@claude-code-workflows": false,
+    "superpowers@claude-plugins-official": false,
+    "quantitative-trading@claude-code-workflows": false,
     "security-guidance@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": false,
     "claude-code-setup@claude-plugins-official": false,
-    "interface-design@interface-design": true,
-    "andrej-karpathy-skills@karpathy-skills": true
+    "interface-design@interface-design": false,
+    "andrej-karpathy-skills@karpathy-skills": false
   },
   "extraKnownMarketplaces": {
     "interface-design": {

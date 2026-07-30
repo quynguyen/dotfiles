@@ -28,12 +28,12 @@ Implement a plan using TDD discipline, with work isolated in git worktrees.
    - Use `wt` (worktrunk) to create isolated worktrees for each chunk of work
    - Each worktree should represent a logical unit that can be developed and tested independently
 
-4. **Implement each chunk** following TDD discipline and frontend skills rules as applicable.
+4. **Implement each chunk** following TDD discipline as applicable.
    - Implement in the sequence defined by the plan
    - Ensure each step's tests pass before moving to the next
    - Keep worktree branches focused — one logical concern per branch
 
-5. **Run the coherence check** across the full implementation per the coherence-check rule.
+5. **Verify:** typecheck, tests, and lint must pass — not done until green. Then confirm no change undermines another, and that nothing is left in an inconsistent state.
 
 ## Constraints
 

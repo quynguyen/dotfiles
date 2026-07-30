@@ -30,12 +30,12 @@ Review recent changes, applying TDD and design rules, then verify coherence.
    - Get the full diff
    - Read changed files to understand context beyond the diff
 
-3. **Review** applying TDD discipline and frontend skills rules as applicable:
+3. **Review** applying TDD discipline as applicable:
    - Are tests present? Do they test behavior, not implementation?
    - Are API boundaries clean?
    - Are frontend patterns correct? (if UI changes present)
 
-4. **Run the coherence check** per the coherence-check rule.
+4. **Verify:** typecheck, tests, and lint must pass — not done until green. Then confirm no change undermines another, and that nothing is left in an inconsistent state.
 
 5. **Output:**
    - **Scope** — what was reviewed

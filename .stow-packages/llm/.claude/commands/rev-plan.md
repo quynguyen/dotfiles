@@ -21,14 +21,14 @@ Review a plan so it aggressively favours red-green TDD, applies design principle
    - Otherwise, identify from conversation context
    - If nothing found, ask the user
 
-2. **Review** applying TDD discipline and frontend skills rules as applicable:
+2. **Review** applying TDD discipline as applicable:
    - Can each task be expressed as a failing test first?
    - Are acceptance criteria specific enough for assertions?
    - Are API boundaries clean?
    - Is the implementation sequence ordered for incremental red-green-refactor?
    - Are frontend patterns correct? (if UI work present)
 
-3. **Run the coherence check** per the coherence-check rule.
+3. **Check coherence:** does each step build only on the ones before it, do the parts agree, and is anything missing that would leave a half-finished state? Then ask whether you answered the question asked or an easier one, and whether your confidence rests on evidence or on the text simply reading well.
 
 4. **Output:**
    - **TDD & API findings** — what to restructure for testability and clean interfaces

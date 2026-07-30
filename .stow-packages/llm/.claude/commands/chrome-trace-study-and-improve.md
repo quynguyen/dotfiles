@@ -47,7 +47,7 @@ Analyze Chrome DevTools performance traces (cold and warm) alongside a page URL 
    For frontend/UI changes:
    - `vercel-react-best-practices` — performance patterns, data fetching strategy, bundle optimization
    - `vercel-composition-patterns` — composition over configuration, compound components, avoid boolean prop proliferation
-   - `interface-design` — craft, consistency, design system alignment
+   - `frontend-design` — craft, consistency, design system alignment
 
    Each spec item must:
    - Reference the specific trace evidence (e.g., "Long task at 2.3s blocking main thread for 180ms")

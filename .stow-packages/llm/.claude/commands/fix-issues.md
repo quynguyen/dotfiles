@@ -26,10 +26,10 @@ Fix issues using TDD discipline, then verify the work is coherent.
    - If `$ARGUMENTS` is empty, use the issues already discussed in the current conversation context
    - If no issues can be identified, ask the user to clarify
 
-2. **Fix each issue** following TDD discipline and frontend skills rules as applicable.
+2. **Fix each issue** following TDD discipline as applicable.
    Fix in a logical order where dependencies exist.
 
-3. **Run the coherence check** across the full set of changes per the coherence-check rule.
+3. **Verify:** typecheck, tests, and lint must pass — not done until green. Then confirm no change undermines another, and that nothing is left in an inconsistent state.
 
 ## Constraints
 
