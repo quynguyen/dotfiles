@@ -1,0 +1,564 @@
+#!/usr/bin/env python3
+"""
+ablate — decide which parts of the Claude Code config help or hinder a new model.
+
+The problem this solves: a new frontier model ships every 2-3 months, and each
+one re-opens the question of which instructions in ~/.claude still earn their
+place. Answering by judgment costs hours and produces a guess. This makes it
+mechanical.
+
+Three commands:
+
+  ablate baseline              what does each config cost in context tokens?
+  ablate profile <name> ...    build a config variant to test against
+  ablate run                   run the task corpus across profiles and score it
+
+Config variants are full CLAUDE_CONFIG_DIR directories under ~/.claude-ablate/.
+
+AUTH CONSTRAINT: a freshly built profile CANNOT authenticate — Claude Code does
+not bootstrap an OAuth session into a new config dir. Run `claude` interactively
+inside a profile once (`CLAUDE_CONFIG_DIR=~/.claude-ablate/<name> claude`) and
+log in, or use the profile named `live`, which measures the real config and
+always works. Comparing `live` against one bootstrapped snapshot is the path
+that runs without ceremony.
+
+See ablate/README.md for the per-release procedure.
+"""
+
+import argparse
+import json
+import os
+import shutil
+import statistics
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+HOME = Path.home()
+LIVE = HOME / ".claude"
+PKG = HOME / "dotfiles/.stow-packages/llm/.claude"
+PROFILES = HOME / ".claude-ablate"
+ABLATE = PKG / "ablate"
+TASKS = ABLATE / "tasks"
+RESULTS = ABLATE / "results"
+
+# Borrowed from the live config by symlink: auth, the plugin cache (gigabytes),
+# and the statusline script.
+BORROW = [".credentials.json", "plugins", "statusline-command.sh"]
+# Copied into each profile from the source ref — the surface actually under test.
+COPY = ["CLAUDE.md", "rules", "commands", "skills", "settings.json"]
+# A profile needs its own .claude.json, but it must be written fresh rather than
+# copied from ~/.claude.json. That file carries OAuth session state, and a copy
+# freezes it: the copy cannot refresh, so runs die with "OAuth session expired
+# and could not be refreshed" while the live config is perfectly healthy. A
+# minimal file supplies the onboarding and trust flags that stop a headless run
+# blocking on a dialog, and nothing else — auth then resolves the normal way
+# (Keychain on macOS).
+def seed_claude_json(dest):
+    (dest / ".claude.json").write_text(
+        json.dumps({"hasCompletedOnboarding": True, "projects": {}}, indent=2) + "\n"
+    )
+
+
+def die(msg):
+    print(f"ablate: {msg}", file=sys.stderr)
+    sys.exit(1)
+
+
+def run(cmd, **kw):
+    return subprocess.run(cmd, capture_output=True, text=True, **kw)
+
+
+# ---------------------------------------------------------------- profiles
+
+
+def copy_entry(src, dst):
+    """Copy a config entry, resolving symlinks so the profile is self-contained.
+
+    skills/ contains relative symlinks into a sibling stow package
+    (../../.agents/skills/...) which would not resolve from a profile directory,
+    so links are followed rather than preserved. Genuinely dangling ones — there
+    is at least one, skills/debug -> gstack/debug — are skipped.
+    """
+    if src.is_dir():
+        shutil.copytree(src, dst, symlinks=False, ignore_dangling_symlinks=True)
+    else:
+        shutil.copy2(src, dst)
+
+
+def materialise_source(ref, dest):
+    """Populate dest with the .claude package as of `ref` ('current' or a git ref).
+
+    Anything absent from a git ref is looked up in ablate/archive/<ref>/ before
+    being reported missing. That fallback exists because ~/dotfiles/.gitignore
+    has a bare `CLAUDE.md` rule, so the global CLAUDE.md was untracked for the
+    whole history up to 2026-07-30 and no tag before that contains it.
+    """
+    missing = []
+
+    if ref == "current":
+        src = PKG
+        if not src.is_dir():
+            die(f"package not found at {src}")
+        for name in COPY:
+            s = src / name
+            if not s.exists():
+                missing.append(name)
+                continue
+            copy_entry(s, dest / name)
+        report_missing(ref, dest, missing)
+        return
+
+    probe = run(["git", "-C", str(HOME / "dotfiles"), "rev-parse", "--verify", f"{ref}^{{commit}}"])
+    if probe.returncode != 0:
+        die(f"not a git ref in ~/dotfiles: {ref}")
+
+    with tempfile.TemporaryDirectory() as tmp:
+        prefix = ".stow-packages/llm/.claude"
+        ar = subprocess.run(
+            ["git", "-C", str(HOME / "dotfiles"), "archive", ref, prefix],
+            capture_output=True,
+        )
+        if ar.returncode != 0:
+            die(f"git archive failed for {ref}: {ar.stderr.decode()[:200]}")
+        tar = subprocess.run(["tar", "-x", "-C", tmp], input=ar.stdout, capture_output=True)
+        if tar.returncode != 0:
+            die(f"tar extract failed: {tar.stderr.decode()[:200]}")
+        src = Path(tmp) / prefix
+        for name in COPY:
+            s = src / name
+            if not s.exists():
+                missing.append(name)
+                continue
+            copy_entry(s, dest / name)
+    report_missing(ref, dest, missing)
+
+
+def report_missing(ref, dest, missing):
+    """Fill gaps from ablate/archive/<ref>/, and say so loudly either way.
+
+    Loudly because the first version of this function skipped silently, which is
+    exactly how an untracked CLAUDE.md went unnoticed.
+    """
+    for name in list(missing):
+        archived = ABLATE / "archive" / ref / name
+        if archived.exists():
+            copy_entry(archived, dest / name)
+            missing.remove(name)
+            print(f"  note: {name} absent from {ref}; restored from ablate/archive/{ref}/")
+    for name in missing:
+        print(f"  WARNING: {name} is absent from {ref} and has no archive copy — "
+              f"this profile does not faithfully represent that config")
+
+
+def cmd_profile(args):
+    dest = PROFILES / args.name
+    if dest.exists():
+        if not args.force:
+            die(f"{dest} exists; pass --force to rebuild")
+        shutil.rmtree(dest)
+    dest.mkdir(parents=True)
+
+    materialise_source(args.source, dest)
+
+    for name in BORROW:
+        target = LIVE / name
+        if target.exists():
+            (dest / name).symlink_to(target)
+
+    seed_claude_json(dest)
+
+    removed = []
+    for rel in args.strip or []:
+        p = dest / rel
+        if p.is_dir():
+            shutil.rmtree(p)
+            removed.append(rel)
+        elif p.exists():
+            p.unlink()
+            removed.append(rel)
+
+    if args.empty_claude_md:
+        (dest / "CLAUDE.md").write_text("")
+        removed.append("CLAUDE.md (emptied)")
+
+    if args.disable_plugins:
+        sp = dest / "settings.json"
+        if sp.exists():
+            cfg = json.loads(sp.read_text())
+            ep = cfg.get("enabledPlugins", {})
+            cfg["enabledPlugins"] = {k: False for k in ep}
+            sp.write_text(json.dumps(cfg, indent=2) + "\n")
+            removed.append(f"all {len(ep)} plugins disabled")
+
+    # Profiles must never prompt: a headless run that blocks is a hung run.
+    # `allow` is dropped rather than kept — bypassPermissions supersedes it, and
+    # a non-empty allow list triggers the workspace-trust dialog, which hangs a
+    # headless run in any directory that has not been trusted interactively.
+    sp = dest / "settings.json"
+    cfg = json.loads(sp.read_text()) if sp.exists() else {}
+    perms = cfg.setdefault("permissions", {})
+    perms["defaultMode"] = "bypassPermissions"
+    perms["allow"] = []
+    sp.write_text(json.dumps(cfg, indent=2) + "\n")
+
+    print(f"built profile {args.name!r} at {dest}")
+    print(f"  source: {args.source}")
+    if removed:
+        for r in removed:
+            print(f"  stripped: {r}")
+    else:
+        print("  stripped: nothing (this is the control)")
+
+
+def profile_env(profile):
+    """Environment for running under `profile`.
+
+    AUTH CONSTRAINT, learned the hard way: a freshly built profile directory
+    cannot authenticate. Claude Code will not bootstrap an OAuth session into a
+    new CLAUDE_CONFIG_DIR — a fresh one reports "Not logged in", and copying
+    ~/.claude.json in gives "OAuth session expired and could not be refreshed"
+    because the copy's session cannot refresh. Seeding oauthAccount/userID/
+    machineID is not enough either. A profile only works once someone has run
+    `claude /login` inside it, which is interactive and one-time per profile.
+
+    So `live` is special: it means "leave CLAUDE_CONFIG_DIR alone and measure the
+    real config", which always authenticates. Comparing live against a snapshot
+    profile is the practical path — that is the comparison that actually runs.
+    """
+    env = dict(os.environ)
+    if profile == "live":
+        env.pop("CLAUDE_CONFIG_DIR", None)
+    else:
+        env["CLAUDE_CONFIG_DIR"] = str(profile_dir(profile))
+    return env
+
+
+def trust_path(profile, path):
+    """Mark `path` as a trusted project inside this profile's own .claude.json.
+
+    Without this a headless run in an unseen directory blocks on the trust
+    dialog and never returns — which looks exactly like a hung model. Written to
+    the profile's copy, so the real ~/.claude.json is untouched.
+    """
+    cj = profile_dir(profile) / ".claude.json"
+    if not cj.exists():
+        return
+    try:
+        cfg = json.loads(cj.read_text())
+    except json.JSONDecodeError:
+        return
+    entry = cfg.setdefault("projects", {}).setdefault(str(path), {})
+    entry["hasTrustDialogAccepted"] = True
+    entry["hasCompletedProjectOnboarding"] = True
+    entry["projectOnboardingSeenCount"] = 1
+    cfg["hasCompletedOnboarding"] = True
+    cj.write_text(json.dumps(cfg, indent=2) + "\n")
+
+
+def profile_dir(name):
+    # "live" is handled by leaving CLAUDE_CONFIG_DIR unset — see profile_env().
+    d = PROFILES / name
+    if not d.is_dir():
+        die(f"no such profile: {name} (expected {d}) — build it with `ablate profile`")
+    return d
+
+
+# ---------------------------------------------------------------- baseline
+
+
+NULL_PROMPT = "Reply with exactly: OK"
+
+
+def measure_context(profile, model, reps):
+    """Context tax = tokens the harness spends before doing any work.
+
+    Measured by sending a prompt that requires no tools and no thinking, then
+    reading how many input tokens were consumed. Whatever that is, it is the
+    floor you pay on every single request.
+    """
+    env = profile_env(profile)
+    samples = []
+    # An empty temp dir, deliberately. Running from $HOME makes Claude Code read
+    # ~/.claude/settings.json a second time as *project* settings, which drags in
+    # its allow list and triggers the workspace-trust prompt. A neutral directory
+    # also keeps any project CLAUDE.md out of the measurement.
+    workdir = PROFILES / ".baseline-workdir"
+    workdir.mkdir(parents=True, exist_ok=True)
+    if profile != "live":
+        trust_path(profile, workdir)
+    for _ in range(reps):
+        try:
+            r = run(
+                [
+                    "claude", "-p", NULL_PROMPT,
+                    "--output-format", "json",
+                    "--model", model,
+                    "--permission-mode", "bypassPermissions",
+                ],
+                env=env,
+                cwd=str(workdir),
+                timeout=180,
+            )
+        except subprocess.TimeoutExpired:
+            print("  ! run timed out after 180s (usually an interactive prompt "
+                  "blocking a headless run)", file=sys.stderr)
+            continue
+        if r.returncode != 0:
+            print(f"  ! run failed: {(r.stderr or r.stdout)[:200]}", file=sys.stderr)
+            continue
+        try:
+            d = json.loads(r.stdout)
+        except json.JSONDecodeError:
+            print(f"  ! unparseable output: {r.stdout[:200]}", file=sys.stderr)
+            continue
+        u = d.get("usage", {}) or {}
+        samples.append(
+            {
+                "input": (
+                    u.get("input_tokens", 0)
+                    + u.get("cache_creation_input_tokens", 0)
+                    + u.get("cache_read_input_tokens", 0)
+                ),
+                "cost": d.get("total_cost_usd", 0.0),
+                "ms": d.get("duration_ms", 0),
+            }
+        )
+    return samples
+
+
+def cmd_baseline(args):
+    print(f"context tax — {args.model}, {args.reps} rep(s) per profile")
+    print("(input tokens consumed by a prompt that does no work; the floor per request)\n")
+    rows = []
+    for name in args.profiles:
+        samples = measure_context(name, args.model, args.reps)
+        if not samples:
+            rows.append((name, None, None, None))
+            continue
+        rows.append(
+            (
+                name,
+                round(statistics.mean(s["input"] for s in samples)),
+                statistics.mean(s["cost"] for s in samples),
+                round(statistics.mean(s["ms"] for s in samples)),
+            )
+        )
+
+    w = max(len(r[0]) for r in rows) + 2
+    print(f"{'profile'.ljust(w)}{'ctx tokens':>12}{'$/req':>10}{'ms':>8}")
+    for name, tok, cost, ms in rows:
+        if tok is None:
+            print(f"{name.ljust(w)}{'FAILED':>12}")
+            continue
+        print(f"{name.ljust(w)}{tok:>12,}{cost:>10.4f}{ms:>8,}")
+
+    ok = [r for r in rows if r[1] is not None]
+    if len(ok) >= 2:
+        base = ok[0]
+        print()
+        for name, tok, cost, _ in ok[1:]:
+            dt, dc = tok - base[1], cost - base[2]
+            print(
+                f"{name} vs {base[0]}: {dt:+,} tokens ({dt / base[1] * 100:+.1f}%), "
+                f"{dc:+.4f} $/req"
+            )
+    return rows
+
+
+# ---------------------------------------------------------------- task corpus
+
+
+def load_tasks(only=None):
+    if not TASKS.is_dir():
+        die(f"no task corpus at {TASKS}")
+    tasks = []
+    for f in sorted(TASKS.glob("*.md")):
+        text = f.read_text()
+        if not text.startswith("---"):
+            continue
+        _, fm, body = text.split("---", 2)
+        meta = {}
+        for line in fm.strip().splitlines():
+            if ":" in line:
+                k, v = line.split(":", 1)
+                meta[k.strip()] = v.strip()
+        meta["slug"] = f.stem
+        meta["prompt"] = body.strip()
+        if only and meta["slug"] not in only:
+            continue
+        missing = [k for k in ("repo", "verify") if k not in meta]
+        if missing:
+            print(f"  ! {f.name} missing frontmatter: {missing}", file=sys.stderr)
+            continue
+        tasks.append(meta)
+    return tasks
+
+
+def isolated_checkout(repo, slug, rep):
+    """Disposable worktree so a run cannot disturb real work.
+
+    Deliberately raw `git worktree` rather than `wt`: the wt post-create hooks
+    (install, prisma generate, migrate) are the right thing for feature work and
+    the wrong thing here, where the point is a cheap throwaway at a known commit.
+    """
+    repo = Path(repo).expanduser()
+    if not repo.is_dir():
+        return None, f"repo not found: {repo}"
+    branch = f"ablate/{slug}-{rep}-{int(time.time())}"
+    dest = Path(tempfile.mkdtemp(prefix="ablate-"))
+    wt = dest / "wt"
+    r = run(["git", "-C", str(repo), "worktree", "add", "-b", branch, str(wt), "HEAD"])
+    if r.returncode != 0:
+        shutil.rmtree(dest, ignore_errors=True)
+        return None, f"worktree add failed: {r.stderr[:200]}"
+    return (wt, branch, repo, dest), None
+
+
+def teardown_checkout(handle):
+    wt, branch, repo, dest = handle
+    run(["git", "-C", str(repo), "worktree", "remove", "--force", str(wt)])
+    run(["git", "-C", str(repo), "branch", "-D", branch])
+    shutil.rmtree(dest, ignore_errors=True)
+
+
+def run_one(task, profile, rep, model, timeout):
+    handle, err = isolated_checkout(task["repo"], task["slug"], rep)
+    if err:
+        return {"ok": False, "why": err}
+    wt = handle[0]
+    env = profile_env(profile)
+    if profile != "live":
+        trust_path(profile, wt)
+    out = {"profile": profile, "task": task["slug"], "rep": rep}
+    try:
+        t0 = time.time()
+        r = subprocess.run(
+            [
+                "claude", "-p", task["prompt"],
+                "--output-format", "json",
+                "--model", model,
+                "--permission-mode", "bypassPermissions",
+            ],
+            capture_output=True, text=True, cwd=str(wt), env=env, timeout=timeout,
+        )
+        out["wall_s"] = round(time.time() - t0, 1)
+        try:
+            d = json.loads(r.stdout)
+        except json.JSONDecodeError:
+            d = {}
+        u = d.get("usage", {}) or {}
+        out["cost"] = d.get("total_cost_usd", 0.0)
+        out["turns"] = d.get("num_turns", 0)
+        out["out_tokens"] = u.get("output_tokens", 0)
+        out["denials"] = len(d.get("permission_denials") or [])
+        out["agent_error"] = bool(d.get("is_error"))
+
+        v = subprocess.run(
+            task["verify"], shell=True, capture_output=True, text=True,
+            cwd=str(wt), timeout=timeout,
+        )
+        out["verify_exit"] = v.returncode
+        out["ok"] = v.returncode == 0
+        out["diff_lines"] = len(
+            run(["git", "-C", str(wt), "diff", "HEAD"]).stdout.splitlines()
+        )
+    except subprocess.TimeoutExpired:
+        out["ok"] = False
+        out["why"] = f"timed out after {timeout}s"
+    finally:
+        teardown_checkout(handle)
+    return out
+
+
+def cmd_run(args):
+    tasks = load_tasks(args.tasks)
+    if not tasks:
+        die("no runnable tasks — see ablate/tasks/TEMPLATE.md")
+
+    cells = len(tasks) * len(args.profiles) * args.reps
+    print(f"{len(tasks)} task(s) x {len(args.profiles)} profile(s) x {args.reps} rep(s) = {cells} runs")
+    print(f"a single agent run on this corpus typically costs $0.10-$2.00, so budget roughly ${cells * 0.5:.2f}-${cells * 2:.2f}")
+    if not args.yes:
+        die("re-run with --yes to spend that")
+
+    results = []
+    for task in tasks:
+        for profile in args.profiles:
+            for rep in range(1, args.reps + 1):
+                label = f"{task['slug']} / {profile} / rep{rep}"
+                print(f"  running {label} ...", flush=True)
+                res = run_one(task, profile, rep, args.model, args.timeout)
+                results.append(res)
+                if res.get("ok"):
+                    print(f"    PASS  ${res.get('cost', 0):.3f}  {res.get('wall_s')}s  {res.get('turns')} turns")
+                else:
+                    print(f"    FAIL  {res.get('why') or 'verify exit ' + str(res.get('verify_exit'))}")
+
+    RESULTS.mkdir(parents=True, exist_ok=True)
+    stamp = time.strftime("%Y-%m-%dT%H-%M-%S")
+    path = RESULTS / f"{stamp}.json"
+    path.write_text(json.dumps({"model": args.model, "results": results}, indent=2) + "\n")
+
+    print(f"\n{'profile':<24}{'pass':>8}{'$ mean':>10}{'s mean':>9}{'turns':>8}")
+    for profile in args.profiles:
+        rs = [r for r in results if r["profile"] == profile]
+        if not rs:
+            continue
+        passed = sum(1 for r in rs if r.get("ok"))
+        done = [r for r in rs if "cost" in r]
+        print(
+            f"{profile:<24}{f'{passed}/{len(rs)}':>8}"
+            f"{statistics.mean([r['cost'] for r in done]) if done else 0:>10.3f}"
+            f"{statistics.mean([r['wall_s'] for r in done]) if done else 0:>9.1f}"
+            f"{statistics.mean([r['turns'] for r in done]) if done else 0:>8.1f}"
+        )
+    print(f"\nwrote {path}")
+    print("\nPass rate is the only score that means anything on its own. Cost and")
+    print("turns are tiebreakers. Neither says anything about whether the code is")
+    print("good — read the diffs before concluding a profile won.")
+
+
+# ---------------------------------------------------------------- cli
+
+
+def main():
+    ap = argparse.ArgumentParser(prog="ablate", description=__doc__,
+                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = ap.add_subparsers(dest="cmd", required=True)
+
+    b = sub.add_parser("baseline", help="measure the context tax of each profile")
+    b.add_argument("profiles", nargs="*", default=["live"])
+    b.add_argument("--model", default="claude-opus-5")
+    b.add_argument("--reps", type=int, default=2)
+    b.set_defaults(fn=cmd_baseline)
+
+    p = sub.add_parser("profile", help="build a config variant to test")
+    p.add_argument("name")
+    p.add_argument("--source", default="current",
+                   help="'current' or a git ref in ~/dotfiles (e.g. pre-opus5-reset)")
+    p.add_argument("--strip", nargs="*", metavar="REL",
+                   help="paths to delete, relative to the config dir (e.g. rules/tdd-discipline.md)")
+    p.add_argument("--empty-claude-md", action="store_true")
+    p.add_argument("--disable-plugins", action="store_true")
+    p.add_argument("--force", action="store_true")
+    p.set_defaults(fn=cmd_profile)
+
+    r = sub.add_parser("run", help="run the task corpus across profiles")
+    r.add_argument("--profiles", nargs="+", required=True)
+    r.add_argument("--tasks", nargs="*", help="task slugs; default all")
+    r.add_argument("--model", default="claude-opus-5")
+    r.add_argument("--reps", type=int, default=3,
+                   help="repeats per cell; model output varies, so 1 tells you little")
+    r.add_argument("--timeout", type=int, default=1800)
+    r.add_argument("--yes", action="store_true", help="required, since runs cost money")
+    r.set_defaults(fn=cmd_run)
+
+    args = ap.parse_args()
+    args.fn(args)
+
+
+if __name__ == "__main__":
+    main()

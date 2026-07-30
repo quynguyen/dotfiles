@@ -2,8 +2,15 @@
 .stow-packages/lazygit/.config/lazygit/state.yml
 .stow-packages/tmux/.tmux/plugins/extrakto
 CLAUDE.md
+# ...except the global one, which is config worth versioning. Without this
+# negation `pre-opus5-reset` silently omitted it and the rollback tag was
+# incomplete.
+!.stow-packages/llm/.claude/CLAUDE.md
 .claude/settings.local.json
 .stow-packages/zsh/.zsh/private_exports
 
 # gstack — tool-managed git repo, too large to track
 .stow-packages/claude-code/.claude/skills/gstack/
+
+# ablate: generated config profiles and run outputs
+.stow-packages/llm/.claude/ablate/results/
