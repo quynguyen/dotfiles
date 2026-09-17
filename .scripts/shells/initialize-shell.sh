@@ -37,7 +37,12 @@ initialize_shell() {
 	esac
 }
 
-# Execute if script is run directly (not sourced)
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-	initialize_shell
+# install.sh *sources* this file, so a "run only when executed directly" guard
+# would make the whole zsh plugin step a silent no-op and leave ~/.zshrc
+# sourcing a ~/.zsh_plugins.sh that was never generated. Follow the same
+# --source-only convention the other scripts here use instead.
+if [[ "${1:-}" == "--source-only" ]]; then
+	return 0 2>/dev/null || true
 fi
+
+initialize_shell

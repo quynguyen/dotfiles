@@ -33,10 +33,16 @@ set_login_shell() {
         return 0
     fi
 
+    # chsh refuses a shell that is not in /etc/shells. Arch's zsh package does
+    # not register itself there (the file is owned by `filesystem`), so on a
+    # fresh Omarchy box we have to add the entry ourselves before chsh.
     if ! grep -qx "$want_path" /etc/shells 2>/dev/null; then
-        echo "Warning: $want_path is not listed in /etc/shells; leaving login shell unchanged."
-        echo "  Fix: echo $want_path | sudo tee -a /etc/shells"
-        return 0
+        echo "$want_path is not listed in /etc/shells; adding it (sudo may ask for your password)..."
+        if ! echo "$want_path" | sudo tee -a /etc/shells >/dev/null 2>&1; then
+            echo "Warning: could not add $want_path to /etc/shells; leaving login shell unchanged."
+            echo "  Fix: echo $want_path | sudo tee -a /etc/shells"
+            return 0
+        fi
     fi
 
     if [[ ! -t 0 ]]; then
