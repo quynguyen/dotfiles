@@ -32,6 +32,6 @@ export PATH="$HOMEBREW_PREFIX/bin:$PATH"
 
 # Update Homebrew
 echo "Updating Homebrew..."
-brew update
+brew update --quiet
 
 echo "Homebrew installation/update complete"

@@ -9,11 +9,11 @@
       "Bash(bun run verify)"
     ],
     "deny": [],
+    "defaultMode": "auto",
     "additionalDirectories": [
       "~/.claude",
       "~/dotfiles"
-    ],
-    "defaultMode": "dontAsk"
+    ]
   },
   "statusLine": {
     "type": "command",

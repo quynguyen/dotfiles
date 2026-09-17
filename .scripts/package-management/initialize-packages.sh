@@ -89,19 +89,19 @@ install_shell_packages() {
                 "zsh-starship")
                     if ! command -v starship &> /dev/null; then
                         echo "Installing starship via Homebrew..."
-                        brew install starship
+                        brew install --quiet starship
                     fi
                     ;;
                 "fish")
                     if ! command -v fish &> /dev/null; then
                         echo "Installing fish via Homebrew..."
-                        brew install fish
+                        brew install --quiet fish
                     fi
                     ;;
                 "nushell")
                     if ! command -v nu &> /dev/null; then
                         echo "Installing nushell via Homebrew..."
-                        brew install nushell
+                        brew install --quiet nushell
                     fi
                     ;;
             esac
@@ -109,7 +109,7 @@ install_shell_packages() {
             # Install zoxide for smart directory navigation
             if ! command -v zoxide &> /dev/null; then
                 echo "Installing zoxide via Homebrew..."
-                brew install zoxide
+                brew install --quiet zoxide
             fi
             ;;
         "nix")

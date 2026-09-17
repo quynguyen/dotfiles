@@ -30,39 +30,39 @@ echo "Note: These installations may require administrator password."
 
 # JetBrains Mono Nerd Font for terminal icons and powerline symbols
 echo "Installing JetBrains Mono Nerd Font..."
-brew install --cask font-jetbrains-mono-nerd-font
+brew install --quiet --cask font-jetbrains-mono-nerd-font
 
 # Google Drive for desktop
 echo "Installing Google Drive..."
-brew install --cask google-drive
+brew install --quiet --cask google-drive
 
 # Logseq for knowledge management
 echo "Installing Logseq..."
-brew install --cask logseq
+brew install --quiet --cask logseq
 
 # Obsidian for note-taking and personal knowledge base
 echo "Installing Obsidian..."
-brew install --cask obsidian
+brew install --quiet --cask obsidian
 
 # Claude Desktop - Official Anthropic Claude AI desktop app
 echo "Installing Claude Desktop..."
-brew install --cask claude
+brew install --quiet --cask claude
 
 # ChatGPT Desktop - Official OpenAI ChatGPT desktop app
 echo "Installing ChatGPT Desktop..."
-brew install --cask chatgpt
+brew install --quiet --cask chatgpt
 
 # Docker Desktop - Container management and development (includes Docker Compose)
 echo "Installing Docker Desktop..."
-brew install --cask docker
+brew install --quiet --cask docker
 
 # Visual Studio Code - Code editor
 echo "Installing Visual Studio Code..."
-brew install --cask visual-studio-code
+brew install --quiet --cask visual-studio-code
 
 # Espanso - Universal text expander / keyboard macros (cross-platform)
 echo "Installing Espanso..."
-brew install --cask espanso
+brew install --quiet --cask espanso
 
 # Claudia - Community GUI toolkit for Claude Code (build from source)
 echo "Installing Claudia (Claude GUI toolkit)..."

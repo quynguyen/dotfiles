@@ -3,6 +3,18 @@
 # go there the directory of this currently 'sourced' script ( quietly )
 pushd $(dirname ${BASH_SOURCE:-$0}) >/dev/null
 
+# Homebrew now defaults to "ask mode", prompting "Do you want to proceed with the
+# installation? [y/n]" whenever a plan pulls in dependencies. A bootstrap script
+# should never block on that, so answer yes up front.
+export HOMEBREW_NO_ASK=1
+
+# Keep the run's output signal-only. Hints are Homebrew's "you could set this env
+# var" chatter, and we run `brew update` explicitly in install-homebrew.sh, so the
+# implicit auto-update before every install is redundant. Real warnings and errors
+# still print: both go to stderr and neither is suppressed by these.
+export HOMEBREW_NO_ENV_HINTS=1
+export HOMEBREW_NO_AUTO_UPDATE=1
+
 # Package Management (Homebrew/Nix/etc)
 source .scripts/package-management/initialize-packages.sh
 

@@ -1,7 +1,7 @@
 {
+  "disabled": false,
   "enableVisualModeIndicator": true,
   "showRecentEmojis": true,
-  "disabled": false,
   "keyBindings": {
     "bottom": "shift+g",
     "changeCase": "mod+shift+u",
