@@ -10,8 +10,13 @@
 .claude/settings.local.json
 .stow-packages/zsh/.zsh/private_exports
 
-# gstack — tool-managed git repo, too large to track
-.stow-packages/claude-code/.claude/skills/gstack/
+# gstack — tool-managed git repo, too large to track. These are checkouts of a
+# separate repo; committing them as bare gitlinks (no .gitmodules entry) breaks
+# every `git submodule update`, which is what the stale claude-code/ path below
+# let happen after the package was renamed to llm/.
+.stow-packages/llm/.claude/skills/gstack/
+.stow-packages/llm/.claude.bak/skills/gstack/
+.stow-packages/llm/.agents/skills/gstack/
 
 # Claude Code writes machine-local synced skills through the ~/.claude/skills symlink
 .stow-packages/llm/.claude/skills/synced/
