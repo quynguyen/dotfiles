@@ -20,8 +20,10 @@ The repository follows a modular, script-driven architecture:
 - `.scripts/package-management/detect.sh` picks the package manager: Spin -> nix; macOS -> homebrew; Linux -> pacman if present, else linuxbrew, else nix. `DOTFILES_PACKAGE_MANAGER` overrides.
 - `.scripts/pacman/install-pacman-packages.sh` mirrors the Homebrew package list for Arch (repo packages via `sudo pacman`, AUR via `yay`). Keep the two lists in sync when adding tools.
 - `.scripts/stow/lib.sh` owns the list of macOS-only stow packages (`MACOS_ONLY_STOW_PACKAGES`) and `backup_conflicts`, which moves pre-existing target files to `~/.dotfiles-backup/<timestamp>/` before stowing. It never descends into symlinks that already point into `.stow-packages` (folded links) - walking through them would move the repo's own files.
+- `DOTFILES_OWNED_DIRS` (same file) lists target directories we own outright, currently just `.config/nvim`. A pre-existing real directory there is moved aside whole instead of merged file-by-file, so stow can fold the path into one symlink and the OS's leftovers (Omarchy ships its own LazyVim config) do not load alongside ours. Symlinks from an earlier stow run are pruned first so the backup holds only the OS's files.
 - mise config lives in `.stow-packages/mise/.config/mise/conf.d/dotfiles.toml` so Omarchy's own `~/.config/mise/config.toml` (claude, codex, gh) is left intact.
-- Clipboard: `~/.bin/xcopy` chooses pbcopy / wl-copy / xclip / xsel; tmux and the zsh `pbcopy` alias go through it on Linux.
+- Clipboard: `~/.bin/xcopy` and `~/.bin/xpaste` choose pbcopy / wl-copy / xclip / xsel and are the single place that decision lives. tmux's copy-mode bindings pipe to `xcopy`, and on non-macOS the zsh `pbcopy`/`pbpaste` aliases are just those two scripts. Both need `WAYLAND_DISPLAY` to pick wl-copy, so over SSH with no display they fall back rather than failing to reach a Wayland server.
+- tmux applies `~/.tmux.conf` **and** `$XDG_CONFIG_HOME/tmux/tmux.conf`, in that order, so on Omarchy the OS's config wins every option both set. `.tmux.conf` hooks `session-created` (the first point at which every config file has been read) to re-source `~/.tmux/includes/after-os-config.tmux.conf` and take back what we want - currently only `status-right`. Keep that list short: anything reclaimed there stops following `omarchy theme set`. It is Linux-only, because macOS has no such file and re-applying would clobber the dracula bar. Omarchy's migrations edit `~/.config/tmux/tmux.conf` in place, so never write to it.
 - The nvim daily-update LaunchAgent is macOS-only on purpose: only one machine should commit `lazy-lock.json`.
 - Tests: `bats .scripts/tests/` (platform detection, stow selection, conflict backup, nvim-update).
 
@@ -58,11 +60,12 @@ stow package-name     # stow
 
 ### Configuration Management
 ```bash
-# Regenerate shell configuration
-./.scripts/zsh/generate-zshrc.sh
+# Regenerate the antidote plugin bundle (~/.zsh_plugins.sh) after editing
+# .zsh_plugins_base.txt / .zsh_plugins_p10k.txt
+./.scripts/antidote/generated-zsh-plugins.sh
 
-# Update tmux plugins
-tmux run-shell ~/.tmux/plugins/tpm/scripts/install_plugins.sh
+# Update tmux plugins (or just re-run the script, which installs then updates)
+./.scripts/tmux/install-tmux-plugins.sh
 
 # Update Neovim plugins (within nvim)
 :Lazy sync
@@ -70,10 +73,13 @@ tmux run-shell ~/.tmux/plugins/tpm/scripts/install_plugins.sh
 
 ## Key Configuration Files
 
-- `.stow-packages/zsh/.zshrc_template` - Main shell configuration template with variable substitution
-- `.stow-packages/tmux/.tmux.conf` - Comprehensive tmux configuration 
-- `.stow-packages/nvim/.config/nvim-lazyvim/` - Neovim setup using LazyVim distribution
-- `.scripts/homebrew/install-homebrew-packages.sh` - Package definitions for Homebrew
+- `.stow-packages/zsh/.zshrc` - Main shell configuration, stowed directly to `~/.zshrc` (no templating)
+- `.stow-packages/zsh/.zsh/` - Sourced fragments (aliases, functions) that `.zshrc` pulls in
+- `.stow-packages/tmux/.tmux.conf` - Comprehensive tmux configuration
+- `.stow-packages/nvim/.config/nvim/` - Neovim setup using LazyVim distribution
+- `.stow-packages/mise/.config/mise/conf.d/dotfiles.toml` - Language runtimes (node, pnpm, ruby, bun, rust, python)
+- `.scripts/homebrew/install-homebrew-packages.sh` - Package definitions for Homebrew (macOS)
+- `.scripts/pacman/install-pacman-packages.sh` - Package definitions for pacman/yay (Arch/Omarchy)
 - `.scripts/antidote/generated-zsh-plugins.sh` - Zsh plugin management with Antidote
 
 ## Tools and Systems Managed
@@ -129,34 +135,18 @@ The desktop applications are automatically installed on macOS as part of `./inst
 
 Note: Desktop apps require interactive installation (admin password) and are macOS-specific.
 
-### Custom Package Management
+### Language Runtimes
 
-The custom packages script (`.scripts/homebrew/install-custom-packages.sh`) handles tools not available through Homebrew:
+Runtimes are managed by mise, not by a bespoke installer. They are declared in
+`.stow-packages/mise/.config/mise/conf.d/dotfiles.toml` (node, pnpm, ruby, bun,
+rust, python) and installed by `.scripts/mise/install-mise-tools.sh` during
+`./install.sh`.
 
-**When to use:**
-- Installing development tools not in Homebrew package registry
-- Tools that require custom installation methods
-- Runtime managers and language-specific toolchains
+Because the dotfiles ship `conf.d/dotfiles.toml` rather than `config.toml`, an
+OS-provided `~/.config/mise/config.toml` (Omarchy's, holding claude/codex/gh)
+keeps working and both layers apply. Check what is active with `mise config ls`.
 
-**Currently managed custom packages:**
-- **Bun** - Fast all-in-one JavaScript runtime and package manager
-
-**Installation process:**
-- Uses official installation scripts when available
-- Configures PATH and shell integration automatically
-- Idempotent - safe to run multiple times
-- Automatically called during `./install.sh`
-
-**Usage:**
-```bash
-# Run separately (after Homebrew packages)
-./.scripts/homebrew/install-custom-packages.sh
-```
-
-**Architecture benefits:**
-- Clean separation between package managers
-- Extensible for future custom installations (rustup, volta, etc.)
-- Maintains dotfiles portability across environments
+To add a runtime, edit `dotfiles.toml` and re-run `./install.sh` (or `mise install`).
 
 ## Development Workflow
 
@@ -164,14 +154,18 @@ When making changes:
 1. Test changes in isolation before running full `./install.sh`
 2. Use individual scripts for specific components
 3. Stow packages are modular - changes to one don't affect others
-4. The `.zshrc` file is generated from template - edit `.zshrc_template` instead
+4. `.zshrc` is stowed directly - edit `.stow-packages/zsh/.zshrc` (or a fragment under `.stow-packages/zsh/.zsh/`)
 5. Custom scripts go in appropriate subdirectories under `bin/`
+6. Run `bats .scripts/tests/` after touching anything under `.scripts/`
 
 ## Important Notes
 
 - Installation is idempotent - safe to run multiple times
 - Uses GNU Stow for symlink management - files are linked, not copied
-- Zsh configuration is template-based with variable substitution
-- Git submodules are used for tmux plugins
-- Homebrew provides consistent package management across platforms
-- Custom AI assistant configurations in `.cursor/` and `.claude/` directories
+- Zsh configuration is stowed as-is; there is no template step
+- Git submodules are used for tmux plugins (tpm). Scope submodule commands to
+  that path - unrelated gitlinks in the tree would otherwise break them
+- Package management is per-platform: Homebrew on macOS, pacman/yay on
+  Arch/Omarchy, Nix elsewhere
+- Custom AI assistant configurations live in `.stow-packages/llm/` (`.claude/`,
+  `.agents/`, `.gemini/`) and `.codex/`
