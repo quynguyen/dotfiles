@@ -80,16 +80,78 @@ fake_cmd() {
 # --- backup_conflicts ---------------------------------------------------------
 
 @test "backup_conflicts moves a pre-existing real file out of the way" {
-  pkg="$WORK/pkgs/nvim"; home="$WORK/home"; backup="$WORK/backup"
-  mkdir -p "$pkg/.config/nvim" "$home/.config/nvim"
-  echo ours > "$pkg/.config/nvim/init.lua"
-  echo theirs > "$home/.config/nvim/init.lua"
+  pkg="$WORK/pkgs/lazygit"; home="$WORK/home"; backup="$WORK/backup"
+  mkdir -p "$pkg/.config/lazygit" "$home/.config/lazygit"
+  echo ours > "$pkg/.config/lazygit/config.yml"
+  echo theirs > "$home/.config/lazygit/config.yml"
 
   run backup_conflicts "$pkg" "$home" "$backup"
   [[ "$status" -eq 0 ]]
-  [[ ! -e "$home/.config/nvim/init.lua" ]]
+  [[ ! -e "$home/.config/lazygit/config.yml" ]]
+  [[ "$(cat "$backup/.config/lazygit/config.yml")" == "theirs" ]]
+  [[ "$output" == *".config/lazygit/config.yml"* ]]
+}
+
+# --- owned directories --------------------------------------------------------
+# Paths in DOTFILES_OWNED_DIRS are moved aside as a whole so stow can fold them
+# into a single symlink, instead of being merged file-by-file.
+
+@test "backup_conflicts moves an owned directory wholesale" {
+  pkg="$WORK/pkgs/nvim"; home="$WORK/home"; backup="$WORK/backup"
+  mkdir -p "$pkg/.config/nvim" "$home/.config/nvim/lua/plugins"
+  echo ours > "$pkg/.config/nvim/init.lua"
+  echo theirs > "$home/.config/nvim/init.lua"
+  echo theirs > "$home/.config/nvim/lua/plugins/theme.lua"
+
+  run backup_conflicts "$pkg" "$home" "$backup"
+  [[ "$status" -eq 0 ]]
+  # the whole directory is gone, so stow can fold it
+  [[ ! -e "$home/.config/nvim" ]]
+  # including files the package has no counterpart for
+  [[ "$(cat "$backup/.config/nvim/lua/plugins/theme.lua")" == "theirs" ]]
   [[ "$(cat "$backup/.config/nvim/init.lua")" == "theirs" ]]
-  [[ "$output" == *".config/nvim/init.lua"* ]]
+  [[ "$output" == *".config/nvim"* ]]
+}
+
+@test "backup_conflicts prunes our own symlinks from an owned directory" {
+  pkg="$WORK/pkgs/nvim"; home="$WORK/home"; backup="$WORK/backup"
+  mkdir -p "$pkg/.config/nvim" "$home/.config/nvim/lua/plugins"
+  echo ours > "$pkg/.config/nvim/init.lua"
+  ln -s "$pkg/.config/nvim/init.lua" "$home/.config/nvim/init.lua"
+  echo theirs > "$home/.config/nvim/lua/plugins/theme.lua"
+
+  run backup_conflicts "$pkg" "$home" "$backup"
+  [[ "$status" -eq 0 ]]
+  [[ ! -e "$home/.config/nvim" ]]
+  # only the foreign file is preserved; our reproducible symlink is not copied
+  [[ "$(cat "$backup/.config/nvim/lua/plugins/theme.lua")" == "theirs" ]]
+  [[ ! -e "$backup/.config/nvim/init.lua" ]]
+}
+
+@test "backup_conflicts removes an owned directory holding only our symlinks" {
+  pkg="$WORK/pkgs/nvim"; home="$WORK/home"; backup="$WORK/backup"
+  mkdir -p "$pkg/.config/nvim" "$home/.config/nvim"
+  echo ours > "$pkg/.config/nvim/init.lua"
+  ln -s "$pkg/.config/nvim/init.lua" "$home/.config/nvim/init.lua"
+
+  run backup_conflicts "$pkg" "$home" "$backup"
+  [[ "$status" -eq 0 ]]
+  [[ ! -e "$home/.config/nvim" ]]
+  # nothing worth keeping, so no backup entry is made
+  [[ ! -d "$backup/.config/nvim" ]]
+  [[ -z "$output" ]]
+}
+
+@test "backup_conflicts leaves an owned directory alone once it is a folded symlink" {
+  pkg="$WORK/pkgs/nvim"; home="$WORK/home"; backup="$WORK/backup"
+  mkdir -p "$pkg/.config/nvim" "$home/.config"
+  echo ours > "$pkg/.config/nvim/init.lua"
+  ln -s "$pkg/.config/nvim" "$home/.config/nvim"
+
+  run backup_conflicts "$pkg" "$home" "$backup"
+  [[ "$status" -eq 0 ]]
+  [[ -L "$home/.config/nvim" ]]
+  [[ -z "$output" ]]
 }
 
 @test "backup_conflicts leaves a symlink that already points into the package alone" {

@@ -14,6 +14,24 @@ MACOS_ONLY_STOW_PACKAGES=(
     ghostty       # on Omarchy the terminal config is owned by the theme system
 )
 
+# Target-relative directories the dotfiles own outright. A pre-existing real
+# directory at one of these paths is moved aside wholesale rather than merged
+# file-by-file, so stow can fold the path into a single symlink. Without this,
+# an OS-provided config (Omarchy ships its own LazyVim setup) leaves its extra
+# files behind and they load alongside ours.
+DOTFILES_OWNED_DIRS=(
+    .config/nvim
+)
+
+# _is_owned_dir <target-relative-path>
+_is_owned_dir() {
+    local candidate="$1" d
+    for d in "${DOTFILES_OWNED_DIRS[@]}"; do
+        [[ "$candidate" == "$d" ]] && return 0
+    done
+    return 1
+}
+
 # stow_packages_for_os <macos|linux> <packages-dir>
 # Prints the package names (one per line, sorted) to stow on this OS.
 stow_packages_for_os() {
@@ -75,6 +93,20 @@ _backup_walk() {
             _stow_owned_link "$dest" "$root" && continue
         elif [[ -d "$dest" ]]; then
             if [[ -d "$entry" && ! -L "$entry" ]]; then
+                if _is_owned_dir "$sub"; then
+                    # Drop symlinks a previous stow run left here: they are
+                    # reproducible, and keeping them would copy our own tree
+                    # into the backup. What remains is the OS's own config.
+                    _prune_stow_links "$dest" "$root"
+                    if [[ -z "$(ls -A "$dest")" ]]; then
+                        rmdir "$dest"
+                        continue
+                    fi
+                    mkdir -p "$backup/$(dirname "$sub")"
+                    mv "$dest" "$backup/$sub"
+                    echo "$sub"
+                    continue
+                fi
                 _backup_walk "$pkg" "$target" "$backup" "$root" "$sub"
                 continue
             fi
@@ -87,4 +119,15 @@ _backup_walk() {
         mv "$dest" "$backup/$sub"
         echo "$sub"
     done
+}
+
+# _prune_stow_links <dir> <packages-root>
+# Removes symlinks under dir that point into the stow tree, then any directories
+# left empty by their removal. Used before moving an owned directory aside.
+_prune_stow_links() {
+    local dir="$1" root="$2" link
+    while IFS= read -r -d '' link; do
+        _stow_owned_link "$link" "$root" && rm -f "$link"
+    done < <(find "$dir" -type l -print0)
+    find "$dir" -mindepth 1 -depth -type d -empty -delete 2>/dev/null || true
 }
