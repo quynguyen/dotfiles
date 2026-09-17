@@ -3,7 +3,12 @@
 # Test suite for nvim-update.sh
 # Run: bats ~/dotfiles/.scripts/tests/nvim-update.bats
 
-SCRIPT_PATH="$(command -v nvim-update.sh)"
+# Prefer the installed copy on PATH (~/.bin), but fall back to the one in this
+# repo so the suite runs from any shell, not just one that has ~/.bin stowed.
+SCRIPT_PATH="$(command -v nvim-update.sh || true)"
+if [[ -z "$SCRIPT_PATH" ]]; then
+  SCRIPT_PATH="$(cd "$(dirname "$BATS_TEST_FILENAME")/../../.stow-packages/bin/.bin" && pwd)/nvim-update.sh"
+fi
 FIXTURES_DIR="$(cd "$(dirname "$BATS_TEST_FILENAME")/fixtures" && pwd)"
 
 setup() {
