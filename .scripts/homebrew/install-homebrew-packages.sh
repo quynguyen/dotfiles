@@ -33,6 +33,8 @@ brew install --quiet unzip || true # May already be installed
 # mise installs node, pnpm, ruby, bun, and rust from its config after stow.
 echo "Installing mise (language runtime manager)..."
 brew install --quiet mise
+# mise config is layered: ~/.config/mise/conf.d/dotfiles.toml (this repo) on top of
+# whatever the OS ships in ~/.config/mise/config.toml (Omarchy pins claude/codex/gh there).
 
 # CLI utilities
 echo "Installing CLI utilities..."

@@ -17,7 +17,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash /Users/quy/.claude/statusline-command.sh"
+    "command": "bash ~/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
     "ralph-loop@claude-plugins-official": false,
@@ -69,5 +69,6 @@
   "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754080918068
-  }
+  },
+  "model": "claude-fable-5-1[1m]"
 }

@@ -1,6 +1,9 @@
 # vim: ft=zsh
 
 export DOTFILES_PATH="$HOME/dotfiles"
+
+# Omarchy (Arch) exports OMARCHY_PATH and its tool paths through bash; mirror it here.
+[[ -r /usr/share/omarchy/default/bash/env-bootstrap ]] && source /usr/share/omarchy/default/bash/env-bootstrap
 export PATH="$HOME/.local/bin:$HOME/.bin:$HOME/.claude/bin:$HOME/.bun/bin:$PATH"
 
 # Load shell configuration to determine prompt type
@@ -93,4 +96,4 @@ if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)
 alias wtb="wt --config ~/.config/worktrunk/bare.toml"
 
 # bun completions
-[ -s "/Users/quy/.bun/_bun" ] && source "/Users/quy/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"

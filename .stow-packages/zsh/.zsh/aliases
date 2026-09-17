@@ -37,7 +37,11 @@ alias wr="wt remove"
 alias cc="claude --dangerously-skip-permissions"
 
 if [[ `uname` != "Darwin" ]]; then
-	if [[ `which xsel 2> /dev/null` ]]; then
+	if command -v wl-copy > /dev/null 2>&1; then
+		# Wayland (Omarchy/Hyprland)
+		alias pbcopy='wl-copy'
+		alias pbpaste='wl-paste --no-newline'
+	elif [[ `which xsel 2> /dev/null` ]]; then
 		alias pbcopy='xsel --clipboard --input'
 		alias pbpaste='xsel --clipboard --output'
 	elif [[ `which xclip 2> /dev/null` ]]; then

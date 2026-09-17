@@ -4,16 +4,35 @@ echo "**************************************************************************
 echo "Installing Zsh plugins"
 echo "********************************************************************************"
 
-# Find antidote installation path
-ANTIDOTE_PATH=""
-if [[ -f "/opt/homebrew/opt/antidote/share/antidote/antidote.zsh" ]]; then
-	ANTIDOTE_PATH="/opt/homebrew/opt/antidote/share/antidote/antidote.zsh"
-elif [[ -f "/usr/local/opt/antidote/share/antidote/antidote.zsh" ]]; then
-	ANTIDOTE_PATH="/usr/local/opt/antidote/share/antidote/antidote.zsh"
-else
-	echo "Error: antidote not found. Please install via 'brew install antidote'"
+if ! command -v zsh &> /dev/null; then
+	echo "Error: zsh not found; install it first (brew install zsh / pacman -S zsh)"
 	exit 1
 fi
+
+# Find antidote. Homebrew and distro packages put it in different places; if
+# none is present, clone it (upstream's recommended install) into ~/.antidote.
+ANTIDOTE_CANDIDATES=(
+	"${HOMEBREW_PREFIX:-/opt/homebrew}/opt/antidote/share/antidote/antidote.zsh"
+	"/opt/homebrew/opt/antidote/share/antidote/antidote.zsh"
+	"/usr/local/opt/antidote/share/antidote/antidote.zsh"
+	"/home/linuxbrew/.linuxbrew/opt/antidote/share/antidote/antidote.zsh"
+	"/usr/share/zsh-antidote/antidote.zsh"
+	"/usr/share/zsh/plugins/zsh-antidote/antidote.zsh"
+	"$HOME/.antidote/antidote.zsh"
+)
+ANTIDOTE_PATH=""
+for candidate in "${ANTIDOTE_CANDIDATES[@]}"; do
+	if [[ -f "$candidate" ]]; then
+		ANTIDOTE_PATH="$candidate"
+		break
+	fi
+done
+if [[ -z "$ANTIDOTE_PATH" ]]; then
+	echo "antidote not found; cloning into ~/.antidote..."
+	git clone --depth=1 https://github.com/mattmc3/antidote.git "$HOME/.antidote"
+	ANTIDOTE_PATH="$HOME/.antidote/antidote.zsh"
+fi
+echo "Using antidote at $ANTIDOTE_PATH"
 
 # Load shell configuration to determine which plugins to use
 DOTFILES_SHELL_MODE="zsh-p10k"

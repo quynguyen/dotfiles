@@ -21,8 +21,11 @@ source .scripts/package-management/initialize-packages.sh
 # $HOME dotfiles
 source .scripts/stow/create-home-dotfile-symlinks.sh
 
-# mise-managed language runtimes (needs stow symlink for ~/.config/mise/config.toml)
+# mise-managed language runtimes (needs stow symlink for ~/.config/mise/conf.d/dotfiles.toml)
 source .scripts/mise/install-mise-tools.sh
+
+# Login shell (chsh to zsh/fish/nu per ~/.shell_config; no-op when already set)
+source .scripts/shells/set-login-shell.sh
 
 # Shell-specific initialization
 source .scripts/shells/initialize-shell.sh

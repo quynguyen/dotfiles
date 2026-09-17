@@ -77,7 +77,10 @@ alias pip "pip3"
 
 # Platform-specific clipboard aliases
 if test (uname) != Darwin
-    if which xsel >/dev/null 2>&1
+    if which wl-copy >/dev/null 2>&1
+        alias pbcopy wl-copy
+        alias pbpaste "wl-paste --no-newline"
+    else if which xsel >/dev/null 2>&1
         alias pbcopy "xsel --clipboard --input"
         alias pbpaste "xsel --clipboard --output"
     else if which xclip >/dev/null 2>&1

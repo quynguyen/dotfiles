@@ -8,30 +8,9 @@
 #   - -o pipefail: Make pipes fail if any command in the pipe fails (not just the last one)
 set -euo pipefail
 
-# Determine which package manager to use
-# Priority: Environment variable > OS detection > Default
-get_package_manager() {
-    # Allow override via environment variable
-    if [[ -n "${DOTFILES_PACKAGE_MANAGER:-}" ]]; then
-        echo "$DOTFILES_PACKAGE_MANAGER"
-        return 0
-    fi
-    
-    # Auto-detect based on environment
-    if [[ -f "/opt/dev/dev.sh" ]]; then
-        # Shopify Spin environment - use Nix
-        echo "nix"
-    elif command -v brew &> /dev/null; then
-        # Homebrew is available - use it
-        echo "homebrew"
-    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        # Linux - prefer Nix
-        echo "nix"
-    else
-        # Default to Homebrew for macOS
-        echo "homebrew"
-    fi
-}
+# Package manager detection lives in detect.sh (pure functions, unit tested in
+# .scripts/tests/platform.bats).
+source "$(dirname "${BASH_SOURCE[0]}")/detect.sh" --source-only
 
 # Initialize package manager
 initialize_package_manager() {
@@ -57,6 +36,9 @@ initialize_package_manager() {
                 echo "Warning: Homebrew packages script not found"
             fi
             ;;
+        "pacman")
+            source .scripts/pacman/install-pacman-packages.sh
+            ;;
         "nix")
             echo "********************************************************************************"
             echo "Initializing Nix package management"
@@ -72,7 +54,7 @@ initialize_package_manager() {
             ;;
         *)
             echo "Error: Unknown package manager '$package_manager'"
-            echo "Supported package managers: homebrew, nix"
+            echo "Supported package managers: homebrew, pacman, nix"
             exit 1
             ;;
     esac
@@ -111,6 +93,14 @@ install_shell_packages() {
                 echo "Installing zoxide via Homebrew..."
                 brew install --quiet zoxide
             fi
+            ;;
+        "pacman")
+            case "$mode" in
+                "zsh-starship") command -v starship &> /dev/null || sudo pacman -S --needed --noconfirm starship ;;
+                "fish")         command -v fish &> /dev/null     || sudo pacman -S --needed --noconfirm fish ;;
+                "nushell")      command -v nu &> /dev/null       || sudo pacman -S --needed --noconfirm nushell ;;
+            esac
+            command -v zoxide &> /dev/null || sudo pacman -S --needed --noconfirm zoxide
             ;;
         "nix")
             # Nix package installation would go here

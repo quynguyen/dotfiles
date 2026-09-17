@@ -3,5 +3,5 @@
 if [ "$(uname)" = "Darwin" ]; then
   pwd | tr -d '\n' | pbcopy
 else
-  pwd | tr -d '\n' | xsel -i -b
+  pwd | tr -d '\n' | ~/.bin/xcopy
 fi

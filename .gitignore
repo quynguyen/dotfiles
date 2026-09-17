@@ -14,5 +14,8 @@ CLAUDE.md
 # gstack — tool-managed git repo, too large to track
 .stow-packages/claude-code/.claude/skills/gstack/
 
+# Claude Code writes machine-local synced skills through the ~/.claude/skills symlink
+.stow-packages/llm/.claude/skills/synced/
+
 # ablate: generated config profiles and run outputs
 .stow-packages/llm/.claude/ablate/results/

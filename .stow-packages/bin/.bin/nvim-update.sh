@@ -124,11 +124,15 @@ snapshot_lockfile() {
 }
 
 # notify(message)
-# Sends macOS notification and creates attention flag.
+# Sends a desktop notification (macOS or Linux) and creates attention flag.
 notify() {
   local message="$1"
   touch "$ATTENTION_FLAG"
-  osascript -e "display notification \"$message\" with title \"Neovim\"" 2>/dev/null || true
+  if command -v osascript &> /dev/null; then
+    osascript -e "display notification \"$message\" with title \"Neovim\"" 2>/dev/null || true
+  elif command -v notify-send &> /dev/null; then
+    notify-send "Neovim" "$message" 2>/dev/null || true
+  fi
 }
 
 main() {

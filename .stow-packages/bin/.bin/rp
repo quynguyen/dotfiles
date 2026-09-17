@@ -3,5 +3,5 @@
 if [ "$(uname)" = "Darwin" ]; then
   realpath "$1" | tr -d '\n' | pbcopy
 else
-  find . -name "filename.txt" -exec realpath {} \; | tr -d '\n' | xsel -i -b
+  find . -name "filename.txt" -exec realpath {} \; | tr -d '\n' | ~/.bin/xcopy
 fi
