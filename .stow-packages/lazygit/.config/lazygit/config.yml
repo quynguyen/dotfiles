@@ -4,7 +4,12 @@ os:
 
 gui:
   expandFocusedSidePanel: true
-  showIcons: true
+  # showIcons is the legacy v2 flag: it makes lazygit emit Material Design icons
+  # from the old Nerd Fonts v2 block (U+F500-U+FD46), which overlaps Arabic
+  # Presentation Forms-A. On a v3 font those codepoints are unmapped, so the
+  # terminal falls back to an Arabic face and commit rows render as e.g. U+FC16
+  # ARABIC LIGATURE JEEM WITH MEEM. v3 moved the icons to U+F0001+ to fix that.
+  nerdFontsVersion: "3"
   authorColors:
     'Quy Nguyen': '#0000FF'
     '*': '#A020F0'
