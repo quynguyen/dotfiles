@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Cross-platform clipboard paste (system clipboard -> stdout).
+# Counterpart to xcopy; keep the two in the same order so they agree on which
+# clipboard is in play.
+if command -v pbpaste >/dev/null 2>&1; then
+  pbpaste  # macOS
+elif command -v wl-paste >/dev/null 2>&1 && [ -n "${WAYLAND_DISPLAY:-}" ]; then
+  wl-paste --no-newline  # Linux / Wayland (Omarchy)
+elif command -v xclip >/dev/null 2>&1; then
+  xclip -selection clipboard -o  # Linux / X11 (preferred)
+elif command -v xsel >/dev/null 2>&1; then
+  xsel -o -b  # Linux / X11 (fallback)
+elif command -v powershell.exe >/dev/null 2>&1; then
+  powershell.exe -NoProfile -Command Get-Clipboard  # Windows
+else
+  # No clipboard reachable (headless or SSH without a Wayland/X display).
+  # Say so rather than hanging on stdin the way `cat` would.
+  echo "xpaste: no clipboard available" >&2
+  exit 1
+fi

@@ -36,16 +36,12 @@ alias ws="wt switch"
 alias wr="wt remove"
 alias cc="claude --dangerously-skip-permissions"
 
+# Give non-macOS shells the pbcopy/pbpaste names, routed through ~/.bin/xcopy
+# and ~/.bin/xpaste. Those scripts already pick between wl-copy, xclip and xsel
+# (and tmux's copy-mode bindings go through xcopy too), so the selection logic
+# lives in exactly one place. They also degrade to a readable message over SSH
+# with no display, where calling wl-copy directly just fails to connect.
 if [[ `uname` != "Darwin" ]]; then
-	if command -v wl-copy > /dev/null 2>&1; then
-		# Wayland (Omarchy/Hyprland)
-		alias pbcopy='wl-copy'
-		alias pbpaste='wl-paste --no-newline'
-	elif [[ `which xsel 2> /dev/null` ]]; then
-		alias pbcopy='xsel --clipboard --input'
-		alias pbpaste='xsel --clipboard --output'
-	elif [[ `which xclip 2> /dev/null` ]]; then
-		alias pbcopy='xclip -selection clipboard'
-		alias pbpaste='xclip -selection clipboard -o'
-	fi
+	alias pbcopy='xcopy'
+	alias pbpaste='xpaste'
 fi
