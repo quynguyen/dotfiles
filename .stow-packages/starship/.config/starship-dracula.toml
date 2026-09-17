@@ -1,6 +1,6 @@
 format = """\
 [](bg:none fg:#bcbcbc)\
-[](bg:#bcbcbc fg:#282A36)\
+$os\
 [](fg:#bcbcbc bg:#c792ea)\
 $directory\
 [](fg:#c792ea bg:#fce94f)\
@@ -10,6 +10,19 @@ $cmd_duration\
 $line_break\
 $character\
 """
+
+# Platform glyph. The same config is stowed on macOS and on Omarchy, so let
+# starship pick the symbol rather than hardcoding one: the Mac keeps its apple
+# and Linux boxes get Tux. Styled to match the segment it replaced.
+[os]
+disabled = false
+format = "[$symbol]($style)"
+style = "bg:#bcbcbc fg:#282A36"
+
+[os.symbols]
+Macos = ""
+Arch = ""
+Linux = ""
 
 [directory]
 format = "[ 󰉋 $path ]($style)"
