@@ -43,6 +43,10 @@ brew install --quiet gettext        # Provides envsubst
 brew install --quiet stow
 brew install --quiet antidote
 brew install --quiet tmuxinator
+brew install --quiet herdr          # Terminal multiplexer for coding agents.
+                                    # devbook is a --remote client only; do NOT
+                                    # `brew services start herdr`. On leopard herdr
+                                    # comes from the omarchy repo, not from here.
 brew install --quiet bat
 brew install --quiet source-highlight
 brew install --quiet yazi           # Terminal file browser

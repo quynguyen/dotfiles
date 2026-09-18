@@ -69,6 +69,5 @@
   "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754080918068
-  },
-  "model": "claude-fable-5-1[1m]"
+  }
 }
