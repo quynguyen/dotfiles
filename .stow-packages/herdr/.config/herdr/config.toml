@@ -18,6 +18,14 @@ panel_bg = "black"
 channel = "stable"
 
 [terminal]
+# Pane shells come from the herdr *server*, which is long-lived and keeps the
+# environment it was launched with. Leaving this empty means "use $SHELL", and a
+# server started before `chsh` (or from a bash login) hands every new pane bash
+# forever - so .zshrc never runs and you have to `exec zsh` by hand. Naming the
+# shell explicitly removes the dependency on the daemon's stale env. Bare name,
+# not an absolute path: zsh is /usr/bin/zsh on leopard and /bin/zsh on devbook,
+# and this file is stowed to both.
+default_shell = "zsh"
 # Matches -c "#{pane_current_path}" on every split, window, and session
 new_cwd = "follow"
 
