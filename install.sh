@@ -36,6 +36,11 @@ source .scripts/tmux/install-tmux-plugins.sh
 # Neovim plugins
 source .scripts/nvim/install-nvim-plugins.sh
 
+# herdr saved-machine profiles (devbook -> leopard). Needs herdr installed and
+# config.toml stowed, both done above. Skips cleanly when there is nothing to
+# register, herdr is absent, the remote is unreachable, or there is no TTY.
+source .scripts/herdr/setup-machines.sh
+
 # Desktop applications (macOS only, optional but automated)
 if [[ "$OSTYPE" == "darwin"* ]]; then
     echo "********************************************************************************"
