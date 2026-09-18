@@ -52,10 +52,16 @@ setup_herdr_machines() {
         return 0
     fi
 
+    # No mapfile/readarray here: macOS ships bash 3.2 as /bin/bash (Apple froze
+    # it at the last GPLv2 release) and both are bash 4+ builtins. This loop is
+    # the portable equivalent, and it drops blank lines while it goes.
     local -a entries=()
-    mapfile -t entries < <(herdr_machines_for_host "$(hostname 2>/dev/null)")
+    local line
+    while IFS= read -r line; do
+        [[ -n "$line" ]] && entries+=("$line")
+    done < <(herdr_machines_for_host "$(hostname 2>/dev/null)")
 
-    if [[ ${#entries[@]} -eq 0 || -z "${entries[0]}" ]]; then
+    if [[ ${#entries[@]} -eq 0 ]]; then
         echo "No herdr machines to register on $(hostname 2>/dev/null); nothing to do"
         return 0
     fi

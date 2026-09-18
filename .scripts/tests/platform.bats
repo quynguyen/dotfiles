@@ -262,3 +262,32 @@ fake_cmd() {
   [[ -z "$output" ]]
   [[ -L "$home/.config/mise/config.toml" ]]
 }
+
+# --- bash 3.2 compatibility ---------------------------------------------------
+
+# macOS ships bash 3.2.57 as /bin/bash (Apple froze it at the last GPLv2
+# release), so every script install.sh reaches on macOS must avoid bash 4+
+# syntax. This suite otherwise runs on Linux under bash 5, where such a bug is
+# invisible - it only surfaces on devbook, mid-bootstrap.
+#
+# The pacman script is exempt: it is Linux-only by construction, reached only
+# when get_package_manager returns "pacman".
+@test "no bash 4+ only syntax on the macOS bootstrap path" {
+  local offenders=""
+  local f
+  for f in $(find "$REPO_DIR/.scripts" -name '*.sh' -not -path '*/pacman/*' | sort); do
+    # Strip comments so documentation naming these builtins does not trip it.
+    local hits
+    hits="$(sed 's/#.*//' "$f" \
+      | grep -nE '\b(mapfile|readarray)\b|declare -A|\$\{[A-Za-z_][A-Za-z_0-9]*(,,|\^\^)\}' \
+      || true)"
+    if [[ -n "$hits" ]]; then
+      offenders+="${f#$REPO_DIR/}: $hits"$'\n'
+    fi
+  done
+  if [[ -n "$offenders" ]]; then
+    echo "bash 4+ syntax found on the macOS path:" >&2
+    echo "$offenders" >&2
+  fi
+  [[ -z "$offenders" ]]
+}
